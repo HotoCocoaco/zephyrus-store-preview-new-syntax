@@ -10,8 +10,6 @@
 #include <store>
 #include <zephstocks>
 //#pragma newdecls required
-new GAME_CSS = false;
-new GAME_CSGO = false;
 
 enum struct PlayerSkin
 {
