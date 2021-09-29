@@ -88,7 +88,7 @@
 		"#format"    "{1:d},{2:d}"
 		"en"        "Credits: {1}          Pot: {2}"
 		"hu"        "Kreditek: {1}         Tét: {2}"
-		"chi"       "点数：{1}          存钱罐：{2}"
+		"chi"       "积分：{1}          存钱罐：{2}"
 	}
 
 	"Hit"
@@ -336,7 +336,7 @@
 	{
 		"#format" 	"{1:s},{2:i}"
 		"en"		"<font color='#00CCFF'>Admin <font color='#ff0000'>{1}<font color='#00CCFF'> opened a giveaway with <font color='#15fb00'>{2} <font color='#00CCFF'>credits"
-		"chi"		"<font color='#00CCFF'>管理员 <font color='#ff0000'>{1}<font color='#00CCFF'> 开启了一次赠送活动，含有 <font color='#15fb00'>{2} <font color='#00CCFF'>点数"
+		"chi"		"<font color='#00CCFF'>管理员 <font color='#ff0000'>{1}<font color='#00CCFF'> 开启了一次赠送活动，含有 <font color='#15fb00'>{2} <font color='#00CCFF'>积分"
 	}
 
 	"Giveaway remaining time"
@@ -357,7 +357,7 @@
 	{
 		"#format" 	"{1:s},{2:s},{3:i}"
 		"en"		"{yellow}{1} {purple}{2} {default}won a giveaway with {green}{3} {yellow}credits"
-		"chi"		"{yellow}{1} {purple}{2} {default}赢得了一次赠送活动，含有 {green}{3} {yellow}点数"
+		"chi"		"{yellow}{1} {purple}{2} {default}赢得了一次赠送活动，含有 {green}{3} {yellow}积分"
 	}
 
 	"Giveaway winner in progress"
@@ -480,7 +480,7 @@
 	"Credit Voucher Not Enough"
 	{
 		"en" "You don't have enough credits to create voucher."
-		"chi" "你没有足够的点数创造代金券。"
+		"chi" "你没有足够的积分创造代金券。"
 	}
 
 	"Buy"
@@ -1591,7 +1591,7 @@
 	"Enter minimum value"
 	{
 		"en"		"Please enter the minium value of Credits in the chat!"
-		"chi"		"请聊天输入点数的最小值！"
+		"chi"		"请聊天输入积分的最小值！"
 	}
 
 	"Enter custom amount"
@@ -1603,7 +1603,7 @@
 	"Enter maximum value"
 	{
 		"en"		"Please enter the maximum value of Credits in the chat!"
-		"chi"		"请聊天输入点数的最大值！"
+		"chi"		"请聊天输入积分的最大值！"
 	}
 
 	"Enter voucher code"
@@ -1718,7 +1718,7 @@
 	"Not enough Credits"
 	{
 		"en"		"You don't have enough credits"
-		"chi"		"你没有足够的点数"
+		"chi"		"你没有足够的积分"
 	}
 
 	"Smaller than min value"

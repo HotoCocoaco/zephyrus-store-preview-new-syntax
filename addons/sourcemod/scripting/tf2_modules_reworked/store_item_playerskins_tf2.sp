@@ -5,7 +5,6 @@
 #include <morecolors>
 #include <tf2>
 #include <tf2_stocks>
-#include <saxtonhale>
 
 #include <store>
 #include <zephstocks>
@@ -20,6 +19,7 @@ enum struct PlayerSkin
 	//bool:bTemporary,
 	int iTeam;
 	int nModelIndex;
+	int iClass;
 }
 
 PlayerSkin g_ePlayerSkins[STORE_MAX_ITEMS];
@@ -54,7 +54,7 @@ public void OnPluginStart()
 
 	GetGameFolderName(m_szGameDir, sizeof(m_szGameDir));
 
-	if(!strequal(m_szGameDir, "tf"))
+	if(!StrEqual(m_szGameDir, "tf"))
 	{
 		SetFailState("[SM]This module is for TF2 only.");
 		return;
@@ -114,9 +114,9 @@ public int PlayerSkins_Equip(int client, int id)
 	//int iIndex =  Store_GetDataIndex(id);
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
-		if(IsPlayerAlive(client) && IsValidClient(client, true) && GetClientTeam(client)==g_ePlayerSkins[m_iData].iTeam && TF2_GetPlayerClassAsNumber(client)==g_ePlayerSkins[m_iData][iClass])
+		if(IsPlayerAlive(client) && IsValidClient(client, true) && GetClientTeam(client)==g_ePlayerSkins[m_iData].iTeam && TF2_GetPlayerClassAsNumber(client)==g_ePlayerSkins[m_iData].iClass)
 		{
-			Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel, m_iData);
+			Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel);
 		}
 
 		else if(Store_IsClientLoaded(client))
@@ -167,7 +167,7 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	if(!client || !IsClientInGame(client))
 		return Plugin_Stop;
 
-	if (IsValidClient(client, true) && !IsPlayerAlive(client) && SaxtonHale_IsValidBoss(client, true))
+	if (IsValidClient(client, true) && !IsPlayerAlive(client))
 		return Plugin_Stop;
 
 	int class = TF2_GetPlayerClassAsNumber(client)-1;
@@ -177,12 +177,12 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	if(m_iEquipped >= 0)
 	{
 		int m_iData = Store_GetDataIndex(m_iEquipped);
-		Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel, m_iData);
+		Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel);
 	}
 	return Plugin_Stop;
 }
 
-void Store_SetClientModel(int client, const char[] model, int index)
+void Store_SetClientModel(int client, const char[] model)
 {
 	SetVariantString(model);
 	AcceptEntityInput(client, "SetCustomModel");
