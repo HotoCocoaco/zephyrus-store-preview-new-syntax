@@ -1,5 +1,148 @@
 ﻿"Phrases"
 {	
+	"Zombie Earning Kill"
+	{
+		"#format" "{1:i},{2:s}"
+		"en" "You earned {green}{1}{default} credits for killing {green}{2}."
+	}
+
+	"Admin chat reload timer exist"
+	{
+		"#format" "{1:i}"
+		"en" "You have already reload the config. Please change or reload the map."
+	}
+	
+	"Timer_Server_ReloadConfig"
+	{
+		"#format" "{1:i}"
+		"en" "Admin has reload store config. The map will be reloaded in {1} sec!"
+	}
+	
+	"confirm_reload_type_0"
+	{
+		"#format" "{1:i}"
+		"en" "Do you want to reset config?\nThe map will be reload after {1} sec!"
+	}
+	
+	"confirm_reload_type_1"
+	{
+		"en" "Do you want to reset config?\nYou need to change the map to apply or may get some bugs."
+	}
+	
+	"QuizzGenerated"
+    {
+        "#format" "{1:i},{2:s},{3:i},{4:i},{5:s}"
+        "en"    "How much is {lime}{1} {2} {lime}{3}{default}? | Prize: {lime}{4{default} {5}"
+        "hu"    "Mennyi {lime}{1}{default} {2} {lime}{3}{default}? | Nyeremény: {lime}{4}{default} kredit"
+    }
+
+    "CorrectAnswer"
+    {
+        "#format" "{1:s},{2:i},{3:s}"
+        "en"     "{1} got the answer right and won {lime}{2}{default} {3}!"
+        "hu"    "{1} leírta a helyes választ és nyert {lime}{2}{default} kreditet!"
+    }
+
+    "NoAnswer"
+    {
+        "#format" "{1:i}"
+        "en"    "Time's up. The correct answer was {lime}{1}{default}."
+        "hu"    "Lejárt az idő. A helyes válasz a(z) {lime}{1}{default} volt."
+    }
+
+	"Seconds to use command"
+    {
+        "#format"    "{1:d}"
+        "en"    "You have to wait {red}{1}{default} seconds before trying to use this command again."
+        "hu"    "Várnod kell {red}{1}{default} másodpercet, hogy használhasd újra a parancsot."
+    }
+
+    "Lost next number"
+    {
+        "#format"    "{1:d}"
+        "en"        "You lost your bet, because the next number was: {orange}{1}"
+        "hu"        "Elvesztetted a tétet, mivel a következő szám a {orange}{1}{default} lett volna."
+    }
+
+    "The chosen number"
+    {
+        "#format"    "{1:d}"
+        "en"        "The chosen number is: {orange}{1}"
+        "hu"        "A kiválasztott szám: {orange}{1}"
+    }
+
+    "The next number"
+    {
+        "#format"    "{1:d}"
+        "en"        "The next number was: {orange}{1}"
+        "hu"        "A következő szám: {orange}{1}"
+    }
+
+    "Hint chosen number"
+    {
+        "#format"    "{1:d}"
+        "en"        "The chosen number is: <font color='#FFD700'>{1}"
+        "hu"        "A kiválasztott szám: <font color='#FFD700'>{1}"
+    }
+
+    "Hint next number"
+    {
+        "#format"    "{1:d}"
+        "en"        "The next number was: <font color='#FFD700'>{1}"
+        "hu"        "A következő szám: <font color='#FFD700'>{1}"
+    }
+
+    "Hol placed"
+    {
+        "#format"    "{1:i},{2:s}"
+        "en"        "You have successfully placed {orange}{1{default} {2}."
+        "hu"        "Sikeresen fogadtál {orange}{1}{default} kredit összegben."
+    }
+
+    "Only number"
+    {
+        "en"        "You can type only numbers..."
+        "hu"        "Csak számokat írhatsz be..."
+    }
+
+    "Higher"
+    {
+        "en"        "HIGHER"
+        "hu"        "NAGYOBB"
+    }
+
+    "Lower"
+    {
+        "en"        "LOWER"
+        "hu"        "KISEBB"
+    }
+
+    "Hol Info 1"
+    {
+        "#format"    "{1:i},{2:i}"
+        "en"        "A number between {1} to {2} has been chosen for you guess if the next number will be higher or lower than the chosen number."
+        "hu"        "Egy szám {1} és {2} között kiválasztásra kerül és neked el kell döntened az a szám nagyobb vagy kisebb a kiválasztott számnál."
+    }
+
+    "Hol Info 2"
+    {
+        "en"        "If you choose the good one, you will win twice your bet."
+        "hu"        "Ha sikerül a jót kiválasztani, akkor a téted kétszeresét nyered."
+    }
+
+    "Hol Info 3"
+    {
+        "#format"    "{1:i}"
+        "en"        "There is a {1} second(s) pause between each games."
+        "hu"        "Minden játék között {1} másodperc szünet van."
+    }
+
+    "high or low"
+    {
+        "en"        "High or Low"
+        "hu"        "Nagyobb vagy Kisebb"
+    }
+	
 	"ColoredSmoke"
 	{
 		"en"        "Colored Smoke"
@@ -574,6 +717,12 @@
 		"en"		"Preview This Item"
 		"chi"		"预览这个物品"
 	}
+	
+	"CP Preview"
+	{
+		"#format" "{1:s},{2:s},{3:s}"
+		"en"		"{1}{2}{3}"
+	}
 
 	"Spawn Preview"
 	{
@@ -765,6 +914,136 @@
 		"chi"		"你制霸了'日常挑战'！尝试再次挑战！"
 	}
 
+	"You earned this round"
+    {
+        "en"        "You earned this round:"
+    }
+
+    "You earned no points this round"
+    {
+        "en"        "You earned no points this round."
+    }
+
+    "escape as VIP"
+    {
+        "en"        "escape as VIP"
+    }
+
+    "kill the VIP"
+    {
+        "en"        "kill the VIP"
+    }
+
+    "hostage rescued"
+    {
+        "en"        "hostage rescued"
+    }
+
+    "bomb explode"
+    {
+        "en"        "bomb explode"
+    }
+
+    "bomb defused"
+    {
+        "en"        "bomb defused"
+    }
+
+    "bomb planted"
+    {
+        "en"        "bomb planted"
+    }
+
+    "be the MVP"
+    {
+        "en"        "be the MVP"
+    }
+
+    "win the round"
+    {
+        "en"        "win the round"
+    }
+
+    "kill"
+    {
+        "en"        "kill"
+    }
+
+    "noscope kill"
+    {
+        "en"        "noscope kill"
+    }
+
+    "backstab kill"
+    {
+        "en"        "backstab kill"
+    }
+
+    "decoy grenade  kill"
+    {
+        "en"        "decoy grenade  kill"
+    }
+
+    "molotov kill"
+    {
+        "en"        "molotov kill"
+    }
+
+    "smokegrenade kill"
+    {
+        "en"        "smokegrenade kill"
+    }
+
+    "flashbang kill"
+    {
+        "en"        "flashbang kill"
+    }
+
+    "HE grenade kill"
+    {
+        "en"        "HE grenade kill"
+    }
+
+    "taser kill"
+    {
+        "en"        "taser kill"
+    }
+
+    "knife kill"
+    {
+        "en"        "knife kill"
+    }
+
+    "teamkill"
+    {
+        "en"        "teamkill"
+    }
+
+    "headshot"
+    {
+        "en"        "headshot"
+    }
+
+    "kill yourself"
+    {
+        "en"        "kill yourself"
+    }
+
+    "assist a kill"
+    {
+        "en"        "assist a kill"
+    }
+
+    "playing on the server"
+    {
+        "en"        "playing on the server"
+    }
+
+    "idle on the server"
+    {
+        "en"        "idle on the server"
+    }
+
 	"Change your bet"
 	{
 		"#format"	"{1:i},{2:s}"
@@ -848,16 +1127,16 @@
 	}
 
 	"Player won x Credits"
-	{
-		"#format"	"{1:N},{2:i},{3:s},{4:t}"
-		"en"		"{1} has won {2} {3} at {4}"
-	}
+    {
+        "#format"    "{1:N},{2:i},{3:s},{4:s}"
+        "en"        "{1} has won {2} {3} at {4}."
+    }
 
-	"Player lost x Credits"
-	{
-		"#format"	"{1:N},{2:i},{3:s},{4:t}"
-		"en"		"{1} has lost {2} {3} at {4}"
-	}
+    "Player lost x Credits"
+    {
+        "#format"    "{1:N},{2:i},{3:s},{4:s}"
+        "en"        "{1} has lost {2} {3} at {4}."
+    }
 
 	"Game Info"
 	{
@@ -1797,9 +2076,9 @@
 	"Total Credits"
 	{
 		"#format"	"{1:i},{2:s}"
-		"en"		"总计：{1} {2}"
+		"en"		"Total：{1} {2}"
+		"chi"		"总计：{1} {2}"
 	}
-
 
 	"Already own item from box. Get Credits back"
 	{

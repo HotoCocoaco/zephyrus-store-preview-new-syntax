@@ -4,10 +4,8 @@
 - L4D2: now supported ([youtube](https://www.youtube.com/watch?v=70m5xKlp1Wo))
 
 # Newly added
-- Re-add valve's weapon skins and knives (warning: this may cause your server get ban. Please use at your own risk).
-	(Please uncomment //#define WEAPONS_KNIVES at line #202 to enable this module)
-- New module: Colored Smoke ported from SHOP. ([youtube](https://www.youtube.com/watch?v=cTyMnAmgixI))
-	(You can change smoke color or change smoke particle's material to custom material. Current no preview support. Preview will support in 1.1 version)
+- Added new preview support for name tag, name and message color.
+- Added new earning method for CSGO (This modules only work for csgo, dont install this if you use the 2009 source engine game. When you enable this please disable all the earning method in the core store.sp or you may get duplicate credits)
 
 # zephyrus-store (support SM 1.10).
 My rewritten zephyrus store
@@ -21,7 +19,7 @@ Since this is zephyrus's store that was rewritten so any custom module that supp
 
 Update 18/3: Re-add tf2 item support (I dont know this is gonna work or not). Please fell free to create a new issue post for bug report.
 
-P/S: Note. Store mainly supported for csgo, any others game (css, l4d2) may have some module that need to rework to be able to use. I will rework any that needed and will store in `<game_name>_modules` folders. Check for it (if you see no item that store in that folder, which mean any module on the main scripting folder are all available to use)
+P/S: Note. Store mainly supported for csgo, any others game (css, l4d2) may have some module that need to rework to be able to use. I will rework any that needed and will store in `<game_name>_modules` folders. Check for it (if you see no item that store in that folder, which mean you need to install any you wish from the main scripting folder and test run if you may find any error.)
 
 # Modules that has preview support:
 - Player Skin (by zephyrus) [youtube](https://www.youtube.com/watch?v=pzkwoiB-jlo)
@@ -37,12 +35,16 @@ P/S: Note. Store mainly supported for csgo, any others game (css, l4d2) may have
 - Grenade skin (by zephyrus)
 - Sprays
 - Say sound
+- Re-add valve's weapon skins and knives (warning: this may cause your server get ban. Please use at your own risk).
+	(Please uncomment //#define WEAPONS_KNIVES at line #202 to enable this module)
 - more will be supported
 # Modules has no preview support:
 - PaintBall Effects (by shanapu)
 - Bullet Spark (by shanapu)
 - Grenade trail (by zephyrus)
 - Laser sight (by zephyrus)
+- Colored Smoke ported from SHOP. ([youtube](https://www.youtube.com/watch?v=cTyMnAmgixI))
+	(You can change smoke color or change smoke particle's material to custom material. Current no preview support. Preview will support in 1.1 version)
 # New feature added:
 - Added "preview" key value enable preview system
 - Added "steam" key value which support for exclusive skin (special thanks Shanabu)
@@ -53,6 +55,11 @@ P/S: Note. Store mainly supported for csgo, any others game (css, l4d2) may have
 ![log](https://user-images.githubusercontent.com/58926275/125444645-8c83105f-cc83-411d-bab9-a9e5689af9d9.png)
 - Store Voucher system module generating code, redeem, check, and buy. Build 5.5.4_voucher_v2 no sqlite support, build 5.5.6 is now has sqlite support)
 ![voucher](https://user-images.githubusercontent.com/58926275/125775715-a282139a-7b71-4b76-9dc6-b3c686459a07.png)
+- Store Give away (v1.0)
+- Store Math credits
+- Store Top list
+- Support for in-game reload items.txt config without having restart server. (You need to change or reload map or may get some bugs).
+- Store Earning credits (Warning: This modules only supported for csgo. If you're using the 2009 source engine. Dont use this. If you're using csgo please disable all the earning method of the core store.sp in the cfg file)
 
 # Important links
 Contact me via steam for bug report:
