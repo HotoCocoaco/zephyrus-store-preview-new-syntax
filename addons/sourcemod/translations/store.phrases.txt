@@ -1,5 +1,5 @@
 ﻿"Phrases"
-{	
+{
 	"Zombie Earning Kill"
 	{
 		"#format" "{1:i},{2:s}"
@@ -10,25 +10,29 @@
 	{
 		"#format" "{1:i}"
 		"en" "You have already reload the config. Please change or reload the map."
+		"chi"	"你已经重设了设置。请更改或重载地图"
 	}
-	
+
 	"Timer_Server_ReloadConfig"
 	{
 		"#format" "{1:i}"
 		"en" "Admin has reload store config. The map will be reloaded in {1} sec!"
+		"chi"	"管理员重设了设置。地图会在 {1} 秒后重载！"
 	}
-	
+
 	"confirm_reload_type_0"
 	{
 		"#format" "{1:i}"
 		"en" "Do you want to reset config?\nThe map will be reload after {1} sec!"
+		"chi"	"你想重设设置？\n地图会在 {1} 秒后重载！"
 	}
-	
+
 	"confirm_reload_type_1"
 	{
 		"en" "Do you want to reset config?\nYou need to change the map to apply or may get some bugs."
+		"chi"	"你想要重设设置？\n你需要更改地图来应用否则会有bug"
 	}
-	
+
 	"QuizzGenerated"
     {
         "#format" "{1:i},{2:s},{3:i},{4:i},{5:s}"
@@ -142,7 +146,7 @@
         "en"        "High or Low"
         "hu"        "Nagyobb vagy Kisebb"
     }
-	
+
 	"ColoredSmoke"
 	{
 		"en"        "Colored Smoke"
@@ -717,7 +721,7 @@
 		"en"		"Preview This Item"
 		"chi"		"预览这个物品"
 	}
-	
+
 	"CP Preview"
 	{
 		"#format" "{1:s},{2:s},{3:s}"

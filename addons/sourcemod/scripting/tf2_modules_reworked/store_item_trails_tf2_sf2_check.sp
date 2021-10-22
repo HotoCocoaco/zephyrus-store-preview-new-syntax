@@ -420,6 +420,10 @@ stock int ShouldHideTrail(int client,int ent)
 
 public Action Hook_TrailSetTransmit(int ent, int client)
 {
+	if (!IsClientInGame(client))
+	{
+		return Plugin_Handled;
+	}
 	int Hide = ShouldHideTrail(client, ent);
 	if(Hide == 1)
 	{
@@ -435,6 +439,8 @@ stock int ShouldHideTrail(int client, int ent)
 {
 	if(1<=g_iTrailOwners[ent]<=MaxClients)
 	{
+		if(!IsClientConnected(g_iTrailOwners[ent]))	return 1;
+		if(!IsClientInGame(g_iTrailOwners[ent]) && IsFakeClient(g_iTrailOwners[ent]) && IsClientSourceTV(g_iTrailOwners[ent]))	return 1;
 		if(!IsPlayerAlive(g_iTrailOwners[ent]))
 		{
 			return 1;
