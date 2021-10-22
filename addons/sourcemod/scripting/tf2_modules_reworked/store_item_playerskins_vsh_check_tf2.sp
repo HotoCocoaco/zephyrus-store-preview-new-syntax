@@ -168,7 +168,10 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	if(!client || !IsClientInGame(client))
 		return Plugin_Stop;
 
-	if (IsValidClient(client, true) && !IsPlayerAlive(client) && SaxtonHale_IsValidBoss(client, true))
+	if (IsValidClient(client, true) && !IsPlayerAlive(client))
+		return Plugin_Stop;
+
+	if (SaxtonHale_IsValidBoss(client, true))	//检查是否为VSH-R的Boss。
 		return Plugin_Stop;
 
 	int class = TF2_GetPlayerClassAsNumber(client)-1;
