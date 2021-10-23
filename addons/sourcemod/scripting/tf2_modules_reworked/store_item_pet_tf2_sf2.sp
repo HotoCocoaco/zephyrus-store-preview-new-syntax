@@ -331,6 +331,11 @@ void Set_EdictFlags(int edict)
 
 public void PetThink(int client)
 {
+	if (!IsClientInGame(client))
+	{
+			return;
+	}
+
 	int iEntity = EntRefToEntIndex(g_iClientPet[client]);
 	if (!IsValidEntity(iEntity))
 	{
