@@ -54,7 +54,7 @@ public Plugin myinfo =
 	name = "Store - Player Skin Module (No ZR version)",
 	author = "nuclear silo", // If you should change the code, even for your private use, please PLEASE add your name to the author here
 	description = "",
-	version = "1.0", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
+	version = "1.2", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
 	url = ""
 }
 
@@ -101,12 +101,12 @@ public void PlayerSkins_OnMapStart()
 {
 	for(int i=0;i<g_iPlayerSkins;++i)
 	{
-		g_ePlayerSkins[i].nModelIndex = PrecacheModel2(g_ePlayerSkins[i].szModel, true);
+		g_ePlayerSkins[i].nModelIndex = PrecacheModel(g_ePlayerSkins[i].szModel, true);
 		Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szModel);
 
 		if(g_ePlayerSkins[i].szArms[0]!=0)
 		{
-			PrecacheModel2(g_ePlayerSkins[i].szArms, true);
+			PrecacheModel(g_ePlayerSkins[i].szArms, true);
 			Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szArms);
 		}
 	}
@@ -116,10 +116,10 @@ public void PlayerSkins_OnMapStart()
 		(FileExists(g_eCvars[g_cvarSkinForceChangeTArms].sCache) || FileExists(g_eCvars[g_cvarSkinForceChangeTArms].sCache, true)))
 	{
 		g_bTForcedSkin = true;
-		PrecacheModel2(g_eCvars[g_cvarSkinForceChangeT].sCache, true);
+		PrecacheModel(g_eCvars[g_cvarSkinForceChangeT].sCache, true);
 		Downloader_AddFileToDownloadsTable(g_eCvars[g_cvarSkinForceChangeT].sCache);
 		
-		PrecacheModel2(g_eCvars[g_cvarSkinForceChangeTArms].sCache, true);
+		PrecacheModel(g_eCvars[g_cvarSkinForceChangeTArms].sCache, true);
 		Downloader_AddFileToDownloadsTable(g_eCvars[g_cvarSkinForceChangeTArms].sCache);
 	}
 	else
@@ -130,10 +130,10 @@ public void PlayerSkins_OnMapStart()
 			(FileExists(g_eCvars[g_cvarSkinForceChangeCT].sCache) || FileExists(g_eCvars[g_cvarSkinForceChangeCT].sCache, true)))
 	{
 		g_bCTForcedSkin = true;
-		PrecacheModel2(g_eCvars[g_cvarSkinForceChangeCT].sCache, true);
+		PrecacheModel(g_eCvars[g_cvarSkinForceChangeCT].sCache, true);
 		Downloader_AddFileToDownloadsTable(g_eCvars[g_cvarSkinForceChangeCT].sCache);
 		
-		PrecacheModel2(g_eCvars[g_cvarSkinForceChangeCTArms].sCache, true);
+		PrecacheModel(g_eCvars[g_cvarSkinForceChangeCTArms].sCache, true);
 		Downloader_AddFileToDownloadsTable(g_eCvars[g_cvarSkinForceChangeCTArms].sCache);
 	}
 	else
@@ -183,7 +183,7 @@ public int PlayerSkins_Equip(int client, int id)
 		/*else
 		{
 			if(Store_IsClientLoaded(client))
-				Chat(client, "%t", "PlayerSkins Settings Changed");
+				CPrintToChat(client, "%s%t", g_sChatPrefix, "PlayerSkins Settings Changed");
 
 			if(g_ePlayerSkins[m_iData][bTemporary])
 			{
@@ -193,9 +193,9 @@ public int PlayerSkins_Equip(int client, int id)
 		}*/
 		
 		else if(Store_IsClientLoaded(client))
-			CPrintToChat(client, " %s%t", g_sChatPrefix, "PlayerSkins Settings Changed");
+			CPrintToChat(client, "%s%t", g_sChatPrefix, "PlayerSkins Settings Changed");
 	}
-	else CPrintToChat(client, "%sStore Player Skin module is currently temporary disabled", g_sChatPrefix);
+	else CPrintToChat(client, "%s%t", g_sChatPrefix, "Player Skin module disabled");
 	
 	return (g_ePlayerSkins[Store_GetDataIndex(id)].iTeam)-2;
 }
@@ -203,7 +203,7 @@ public int PlayerSkins_Equip(int client, int id)
 public int PlayerSkins_Remove(int client,int id)
 {
 	/*if(Store_IsClientLoaded(client) && !g_eCvars[g_cvarSkinChangeInstant].aCache)
-		CPrintToChat(client, "%t", "PlayerSkins Settings Changed");*/
+		CPrintToChat(client, "%s%t", g_sChatPrefix, "PlayerSkins Settings Changed");*/
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
 	
@@ -213,7 +213,7 @@ public int PlayerSkins_Remove(int client,int id)
 		}
 		else CPrintToChat(client, " %s%t", g_sChatPrefix, "PlayerSkins Settings Changed");
 	}
-	else CPrintToChat(client, "%sStore Player Skin module is currently temporary disabled", g_sChatPrefix);
+	else CPrintToChat(client, "%s%t", g_sChatPrefix, "Player Skin module disabled");
 	
 	return view_as<int>(g_ePlayerSkins[Store_GetDataIndex(id)].iTeam)-2;
 }
@@ -230,7 +230,7 @@ public Action PlayerSkins_PlayerSpawn(Event event,const char[] name,bool dontBro
 		
 		CreateTimer(Delay, PlayerSkins_PlayerSpawnPost, GetClientUserId(client));
 	}
-	else CPrintToChat(client, "%sStore Player Skin module is currently temporary disabled");
+	else CPrintToChat(client, "%s%t", g_sChatPrefix, "Player Skin module disabled");
 	
 	return Plugin_Continue;
 }
@@ -311,7 +311,7 @@ void Store_SetClientModel(int client, const char[] model, const int skin=0, cons
 	
 	//CreateTimer(0.15, Timer_RemovePlayerWeapon, GetClientUserId(client));
 	RemoveClientGloves(client, index);
-	if(GAME_CSGO & arms[0]!=0)
+	if(GAME_CSGO && arms[0]!=0)
 	{
 		SetEntPropString(client, Prop_Send, "m_szArmsModel", arms);
 	}
