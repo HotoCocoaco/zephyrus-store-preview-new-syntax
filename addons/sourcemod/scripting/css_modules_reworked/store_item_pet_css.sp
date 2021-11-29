@@ -137,6 +137,7 @@ public bool Pets_Config(KeyValues &kv, int itemid)
 	kv.GetString("idle2", g_sIdle2[g_iCount], 64);
 	kv.GetString("run", g_sRun[g_iCount], 64);
 	kv.GetVector("position", g_fPosition[g_iCount]);
+	kv.GetVector("angles", g_fAngles[g_iCount]);
 	g_iCount++;
 
 	return true;
@@ -320,6 +321,7 @@ void Set_EdictFlags(int edict)
 
 public void PetThink(int client)
 {
+	int iIndex = g_iSelectedPet[client];
 	int iEntity = EntRefToEntIndex(g_iClientPet[client]);
 	if (!IsValidEntity(iEntity))
 	{
@@ -369,7 +371,7 @@ public void PetThink(int client)
 	pos[2] += petoff;
 
 	// Look at owner
-	ang[1] = (ArcTangent2(distY, distX) * 180) / 3.14;
+	ang[1] = ((ArcTangent2(distY, distX) * 180) / 3.14) + g_fAngles[iIndex][1];
 
 	TeleportEntity(iEntity, pos, ang, NULL_VECTOR);
 }
