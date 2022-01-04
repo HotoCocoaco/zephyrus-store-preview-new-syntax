@@ -343,18 +343,15 @@ public void PetThink(int client)
 		return;
 	}
 
-	if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) || TF2_IsPlayerInCondition(client, TFCond_Disguised))
+	if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) || TF2_IsPlayerInCondition(client, TFCond_Disguised) || TF2_IsPlayerInCondition(client, TFCond_StealthedUserBuffFade))
 	{
 		AcceptEntityInput(iEntity, "TurnOff", iEntity, iEntity, 0);
 		return;
 	}
-
-
-	if(TF2_IsPlayerInCondition(client, TFCond_StealthedUserBuffFade))
+	else
 	{
-		return;
+		AcceptEntityInput(iEntity, "TurnOn", iEntity, iEntity, 0);
 	}
-
 
 	float pos[3];
 	float ang[3];
@@ -414,7 +411,7 @@ void ResetPet(int client)
 		return;
 
 	AcceptEntityInput(iEntity, "Kill");
-	//SDKUnhook(iEntity, SDKHook_SetTransmit, Hook_SetTransmit);
+	SDKUnhook(iEntity, SDKHook_SetTransmit, Hook_SetTransmit);
 }
 
 float GetClientDistanceToGround(int ent, int client, float pos2)
