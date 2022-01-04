@@ -171,7 +171,7 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	if (IsValidClient(client, true) && !IsPlayerAlive(client))
 		return Plugin_Stop;
 
-	if (VSH2Player(client).GetPropInt("bIsBoss"))	//检查是否为VSH2的Boss。
+	if (VSH2Player(client).GetPropAny("bIsBoss"))	//检查是否为VSH2的Boss。
 		return Plugin_Stop;
 
 	int class = TF2_GetPlayerClassAsNumber(client)-1;
