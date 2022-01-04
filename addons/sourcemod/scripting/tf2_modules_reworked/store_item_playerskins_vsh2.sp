@@ -45,7 +45,7 @@ public Plugin myinfo =
 	name = "Store - Player Skin Module (No ZR version)",
 	author = "nuclear silo, HotoCocoa", // If you should change the code, even for your private use, please PLEASE add your name to the author here
 	description = "",
-	version = "1.0.1", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
+	version = "1.0.2", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
 	url = ""
 }
 
@@ -171,7 +171,7 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	if (IsValidClient(client, true) && !IsPlayerAlive(client))
 		return Plugin_Stop;
 
-	if (SaxtonHale_IsValidBoss(client, true))	//检查是否为VSH2的Boss
+	if (VSH2Player(client).GetPropAny("bIsBoss"))	//检查是否为VSH2的Boss。
 		return Plugin_Stop;
 
 	int class = TF2_GetPlayerClassAsNumber(client)-1;

@@ -39,8 +39,8 @@ Handle g_hTimerPreview[MAXPLAYERS + 1];
 
 int g_iPreviewEntity[MAXPLAYERS + 1] = {INVALID_ENT_REFERENCE, ...};
 
-//bool g_bHide[MAXPLAYERS + 1];
-//Handle g_hHideCookie = INVALID_HANDLE;
+bool g_bHide[MAXPLAYERS + 1];
+Handle g_hHideCookie = INVALID_HANDLE;
 
 public Plugin myinfo =
 {
@@ -57,15 +57,15 @@ public void OnPluginStart()
 
 	LoadTranslations("store.phrases");
 
-	//RegConsoleCmd("sm_hidepet", Command_Hide, "Hides the Pets");
-	//RegConsoleCmd("sm_hidepets", Command_Hide, "Hides the Pets");
+	RegConsoleCmd("sm_hidepet", Command_Hide, "Hides the Pets");
+	RegConsoleCmd("sm_hidepets", Command_Hide, "Hides the Pets");
 
 	HookEvent("player_spawn", Event_PlayerSpawn);
 	HookEvent("player_death", Event_PlayerDeath);
 	HookEvent("player_team", Event_PlayerTeam);
 
-	//g_hHideCookie = RegClientCookie("Pets_Hide_Cookie", "Cookie to check if Pets are blocked", CookieAccess_Private);
-	//SetCookieMenuItem(PrefMenu, 0, "");
+	g_hHideCookie = RegClientCookie("Pets_Hide_Cookie", "Cookie to check if Pets are blocked", CookieAccess_Private);
+	SetCookieMenuItem(PrefMenu, 0, "");
 }
 
 public void Store_OnConfigExecuted(char[] prefix)
@@ -73,7 +73,7 @@ public void Store_OnConfigExecuted(char[] prefix)
 	strcopy(g_sChatPrefix, sizeof(g_sChatPrefix), prefix);
 }
 
-/*public void PrefMenu(int client, CookieMenuAction actions, any info, char[] buffer, int maxlen)
+public void PrefMenu(int client, CookieMenuAction actions, any info, char[] buffer, int maxlen)
 {
 	if (actions == CookieMenuAction_DisplayOption)
 	{
@@ -115,7 +115,7 @@ public Action Command_Hide(int client, int args)
 	}
 
 	return Plugin_Handled;
-}*/
+}
 
 public void Pets_OnMapStart()
 {
@@ -169,7 +169,7 @@ public int Pets_Remove(int client, int itemid)
 public void OnClientConnected(int client)
 {
 	g_iSelectedPet[client] = -1;
-	//g_bHide[client] = false;
+	g_bHide[client] = false;
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
@@ -309,17 +309,17 @@ void CreatePet(int client)
 
 		Set_EdictFlags(iEntity);
 
-		//SDKHook(iEntity, SDKHook_SetTransmit, Hook_SetTransmit);
+		SDKHook(iEntity, SDKHook_SetTransmit, Hook_SetTransmit);
 
 
 	}
 }
 
-/*public Action Hook_SetTransmit(int entity, int client)
+public Action Hook_SetTransmit(int entity, int client)
 {
 	Set_EdictFlags(entity);
 	return g_bHide[client] ? Plugin_Handled : Plugin_Continue;
-}*/
+}
 
 void Set_EdictFlags(int edict)
 {
@@ -333,7 +333,7 @@ public void PetThink(int client)
 {
 	if (!IsClientInGame(client))
 	{
-			return;
+		return;
 	}
 
 	int iEntity = EntRefToEntIndex(g_iClientPet[client]);
@@ -343,17 +343,15 @@ public void PetThink(int client)
 		return;
 	}
 
-	if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) || TF2_IsPlayerInCondition(client, TFCond_Disguised))
+	if (TF2_IsPlayerInCondition(client, TFCond_Cloaked) || TF2_IsPlayerInCondition(client, TFCond_Disguised) || TF2_IsPlayerInCondition(client, TFCond_StealthedUserBuffFade))
 	{
+		AcceptEntityInput(iEntity, "TurnOff", iEntity, iEntity, 0);
 		return;
 	}
-
-
-	if(TF2_IsPlayerInCondition(client, TFCond_StealthedUserBuffFade))
+	else
 	{
-		return;
+		AcceptEntityInput(iEntity, "TurnOn", iEntity, iEntity, 0);
 	}
-
 
 	float pos[3];
 	float ang[3];
@@ -413,7 +411,7 @@ void ResetPet(int client)
 		return;
 
 	AcceptEntityInput(iEntity, "Kill");
-	//SDKUnhook(iEntity, SDKHook_SetTransmit, Hook_SetTransmit);
+	SDKUnhook(iEntity, SDKHook_SetTransmit, Hook_SetTransmit);
 }
 
 float GetClientDistanceToGround(int ent, int client, float pos2)
