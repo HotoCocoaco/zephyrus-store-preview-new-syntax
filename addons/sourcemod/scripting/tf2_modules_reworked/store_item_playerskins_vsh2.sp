@@ -40,6 +40,46 @@ int g_iPreviewEntity[MAXPLAYERS + 1] = {INVALID_ENT_REFERENCE, ...};
 
 char g_sChatPrefix[128];
 
+bool g_bSdkStarted = false;
+Handle g_hSdkEquipWearable;
+int g_iPlayerBGroups[MAXPLAYERS+1];
+
+#define BODYGROUP_SCOUT_HAT				(1 << 0)
+#define BODYGROUP_SCOUT_HEADPHONES		(1 << 1)
+#define BODYGROUP_SCOUT_SHOESSOCKS		(1 << 2)
+#define BODYGROUP_SCOUT_DOGTAGS			(1 << 3)
+
+#define BODYGROUP_SOLDIER_ROCKET		(1 << 0)
+#define BODYGROUP_SOLDIER_HELMET		(1 << 1)
+#define BODYGROUP_SOLDIER_MEDAL			(1 << 2)
+#define BODYGROUP_SOLDIER_GRENADES		(1 << 3)
+
+#define BODYGROUP_PYRO_HEAD				(1 << 0)
+#define BODYGROUP_PYRO_GRENADES			(1 << 1)
+
+#define BODYGROUP_DEMO_SMILE			(1 << 0)
+#define BODYGROUP_DEMO_SHOES			(1 << 1)
+
+#define BODYGROUP_HEAVY_HANDS			(1 << 0)
+
+#define BODYGROUP_ENGINEER_HELMET		(1 << 0)
+#define BODYGROUP_ENGINEER_ARM			(1 << 1)
+
+#define BODYGROUP_MEDIC_BACKPACK		(1 << 0)
+
+#define BODYGROUP_SNIPER_ARROWS			(1 << 0)
+#define BODYGROUP_SNIPER_HAT			(1 << 1)
+#define BODYGROUP_SNIPER_BULLETS		(1 << 2)
+
+#define BODYGROUP_SPY_MASK				(1 << 0)
+
+#define EF_BONEMERGE            (1 << 0)
+#define EF_NOSHADOW             (1 << 4)
+#define EF_BONEMERGE_FASTCULL   (1 << 7)
+#define EF_PARENT_ANIMATES      (1 << 9)
+#define BLUE_sign "models/player/items/all_class/blue_sign.mdl"
+#define RED_sign "models/player/items/all_class/red_sign.mdl"
+
 public Plugin myinfo =
 {
 	name = "Store - Player Skin Module (No ZR version)",
@@ -82,6 +122,22 @@ public void PlayerSkins_OnMapStart()
 		g_ePlayerSkins[i].nModelIndex = PrecacheModel2(g_ePlayerSkins[i].szModel, true);
 		Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szModel);
 	}
+
+	PrecacheModel(BLUE_sign, true);
+	PrecacheModel(RED_sign, true);
+	AddFileToDownloadsTable(BLUE_sign);
+	AddFileToDownloadsTable("models/player/items/all_class/blue_sign.dx80.vtx");
+	AddFileToDownloadsTable("models/player/items/all_class/blue_sign.dx90.vtx");
+	AddFileToDownloadsTable("models/player/items/all_class/blue_sign.sw.vtx");
+	AddFileToDownloadsTable("models/player/items/all_class/blue_sign.vvd");
+	AddFileToDownloadsTable(RED_sign);
+	AddFileToDownloadsTable("models/player/items/all_class/red_sign.dx80.vtx");
+	AddFileToDownloadsTable("models/player/items/all_class/red_sign.dx90.vtx");
+	AddFileToDownloadsTable("models/player/items/all_class/red_sign.sw.vtx");
+	AddFileToDownloadsTable("models/player/items/all_class/red_sign.vvd");
+	AddFileToDownloadsTable("materials/models/player/items/all_class/BLACK.vmt");
+	AddFileToDownloadsTable("materials/models/player/items/all_class/BLUE.vmt");
+	AddFileToDownloadsTable("materials/models/player/items/all_class/RED.vmt");
 }
 
 public int PlayerSkins_Reset()
@@ -188,11 +244,15 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 
 void Store_SetClientModel(int client, const char[] model)
 {
+	if (VSH2Player(client).GetPropAny("bIsBoss"))
+		return;
+
 	SetVariantString(model);
 	AcceptEntityInput(client, "SetCustomModel");
 	SetEntProp(client, Prop_Send, "m_bCustomModelRotates", 0);
 	SetEntProp(client, Prop_Send, "m_bUseClassAnimations", 1);
-	//SetEntProp(client, Prop_Send, "m_nBody", CalculateBodyGroups(client));
+	SetEntProp(client, Prop_Send, "m_nBody", CalculateBodyGroups(client));
+	(GetClientTeam(client) == 2) ? EquipWearable(client, RED_sign) : EquipWearable(client, BLUE_sign);
 }
 
 public void Store_OnPreviewItem(int client, char[] type, int index)
@@ -345,4 +405,119 @@ stock int TF2_GetPlayerClassAsNumber(int client)
 		}
 	}
 	return Num;
+}
+
+stock EquipWearable(client, char[] Mdl)
+{ // ^ bad name probably
+	int wearable = CreateWearable(client, Mdl);
+	if (wearable == -1)
+		return -1;
+	return wearable;
+}
+
+stock CreateWearable(client, String:model[]) // Randomizer code :3
+{
+	int ent = CreateEntityByName("tf_wearable");
+	if (!IsValidEntity(ent)) return -1;
+	SetEntProp(ent, Prop_Send, "m_nModelIndex", PrecacheModel(model));
+	SetEntProp(ent, Prop_Send, "m_fEffects", EF_BONEMERGE|EF_NOSHADOW|EF_PARENT_ANIMATES);
+	SetEntProp(ent, Prop_Send, "m_iTeamNum", GetClientTeam(client));
+	SetEntProp(ent, Prop_Send, "m_usSolidFlags", 4);
+	SetEntProp(ent, Prop_Send, "m_CollisionGroup", 11);
+	SetEntProp(ent, Prop_Send, "m_bValidatedAttachedEntity", 1);
+	DispatchSpawn(ent);
+	SetVariantString("!activator");
+	ActivateEntity(ent);
+	TF2_EquipWearable(client, ent); // urg
+	return ent;
+}
+
+// *sigh*
+stock TF2_EquipWearable(int client,int Ent)
+{
+	if (g_bSdkStarted == false || g_hSdkEquipWearable == INVALID_HANDLE)
+	{
+		TF2_SdkStartup();
+		LogMessage("Error: Can't call EquipWearable, SDK functions not loaded! If it continues to fail, reload plugin or restart server. Make sure your gamedata is intact!");
+	}
+	else
+	{
+		SDKCall(g_hSdkEquipWearable, client, Ent);
+	}
+}
+stock bool TF2_SdkStartup()
+{
+	Handle hGameConf = LoadGameConfigFile("tf2items.randomizer");
+	if (hGameConf == INVALID_HANDLE)
+	{
+		LogMessage("Couldn't load SDK functions (GiveWeapon). Make sure tf2items.randomizer.txt is in your gamedata folder! Restart server if you want wearable weapons.");
+		return false;
+	}
+	StartPrepSDKCall(SDKCall_Player);
+	PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, "CTFPlayer::EquipWearable");
+	PrepSDKCall_AddParameter(SDKType_CBaseEntity, SDKPass_Pointer);
+	g_hSdkEquipWearable = EndPrepSDKCall();
+
+	CloseHandle(hGameConf);
+	g_bSdkStarted = true;
+	return true;
+}
+
+CalculateBodyGroups(client)
+{
+	int iBodyGroups = g_iPlayerBGroups[client];
+//	new iItemGroups = 0;
+
+	TFClassType class = TF2_GetPlayerClass(client);
+	switch(class)
+	{
+		case TFClass_Scout:
+		{
+			iBodyGroups |= BODYGROUP_SCOUT_HAT;
+			iBodyGroups |= BODYGROUP_SCOUT_HEADPHONES;
+			iBodyGroups |= BODYGROUP_SCOUT_SHOESSOCKS;
+			iBodyGroups |= BODYGROUP_SCOUT_DOGTAGS;
+		}
+		case TFClass_Soldier:
+		{
+			iBodyGroups |= BODYGROUP_SOLDIER_ROCKET;
+			iBodyGroups |= BODYGROUP_SOLDIER_HELMET;
+			iBodyGroups |= BODYGROUP_SOLDIER_GRENADES;
+		}
+		case TFClass_Pyro:
+		{
+			iBodyGroups |= BODYGROUP_PYRO_HEAD;
+			iBodyGroups |= BODYGROUP_PYRO_GRENADES;
+		}
+		case TFClass_DemoMan:
+		{
+			iBodyGroups |= BODYGROUP_DEMO_SMILE;
+			iBodyGroups |= BODYGROUP_DEMO_SHOES;
+		}
+		case TFClass_Heavy:
+		{
+			iBodyGroups = BODYGROUP_HEAVY_HANDS;
+		}
+		case TFClass_Engineer:
+		{
+			iBodyGroups |= BODYGROUP_ENGINEER_HELMET;
+			iBodyGroups |= BODYGROUP_ENGINEER_ARM;
+		}
+		case TFClass_Medic:
+		{
+			iBodyGroups |= BODYGROUP_MEDIC_BACKPACK;
+		}
+		case TFClass_Sniper:
+		{
+			iBodyGroups |= BODYGROUP_SNIPER_ARROWS;
+			iBodyGroups |= BODYGROUP_SNIPER_HAT;
+			iBodyGroups |= BODYGROUP_SNIPER_BULLETS;
+		}
+		case TFClass_Spy:
+		{
+			iBodyGroups |= BODYGROUP_SPY_MASK;
+		}
+	}
+
+	return iBodyGroups;
 }
