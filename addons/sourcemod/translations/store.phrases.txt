@@ -2665,7 +2665,7 @@
 		"#format" "{1:d}"
 		"en" "You picked up {HIGHLIGHT}{1} credits{NORMAL}."
 		"hu" "{HIGHLIGHT}{1} kreditet{NORMAL} vettél fel."
-		"chi" "你拾取 {HIGHLIGHT}{1} credits{NORMAL}."
+		"chi" "你拾取 {HIGHLIGHT}{1} 积分{NORMAL}."
 	}
 
 	"Credit Gift Dropped"
@@ -2673,7 +2673,7 @@
 		"#format" "{1:d}"
 		"en" "You dropped {HIGHLIGHT}{1} credits{NORMAL} as a gift."
 		"hu" "{HIGHLIGHT}{1} kreditet{NORMAL} ajándékoztál el."
-		"chi" "你丢弃 {HIGHLIGHT}{1} credits{NORMAL}."
+		"chi" "你丢弃 {HIGHLIGHT}{1} 积分{NORMAL}."
 	}
 
 	"Must be Alive"
