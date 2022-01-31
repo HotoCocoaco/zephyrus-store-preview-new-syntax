@@ -2461,7 +2461,7 @@
 		"#format" "{1:d},{2:s}"
 		"en" "You have sent {HIGHLIGHT}{1}{NORMAL} credits to {HIGHLIGHT}{2}{NORMAL}.
 		"hu" "{HIGHLIGHT}{1}{NORMAL} kreditet küldtél neki: {HIGHLIGHT}{2}{NORMAL}."
-		"chi" "你已经发送 {HIGHLIGHT}{1}{NORMAL} credits积分给 {HIGHLIGHT}{2}{NORMAL}.
+		"chi" "你已经发送 {HIGHLIGHT}{1}{NORMAL} 积分给 {HIGHLIGHT}{2}{NORMAL}.
 	}
 
 	"Credit Gift Received"
@@ -2469,7 +2469,7 @@
 		"#format" "{1:d},{2:s}"
 		"en" "{HIGHLIGHT}{2}{NORMAL} has sent you {HIGHLIGHT}{1}{NORMAL} credits."
 		"hu" "{HIGHLIGHT}{2}{NORMAL} {HIGHLIGHT}{1}{NORMAL} kreditet küldött neked."
-		"chi" "{HIGHLIGHT}{2}{NORMAL} 给了你 {HIGHLIGHT}{1}{NORMAL} credits."
+		"chi" "{HIGHLIGHT}{2}{NORMAL} 给了你 {HIGHLIGHT}{1}{NORMAL} 积分。"
 	}
 
 	"Package Sell"
@@ -2565,7 +2565,7 @@
 		"#format" "{1:s}{2:d}"
 		"en" "{1} has been given {2} credits."
 		"hu" "{1} {2} kreditet kapott."
-		"chi" "{1} 获得 {2} credits."
+		"chi" "{1} 获得 {2} 积分。"
 	}
 
 	"Betting Won"
@@ -2573,7 +2573,7 @@
 		"#format" "{1:d}"
 		"en" "Your bet was successful. You won {1} credits."
 		"hu" "Sikeres volt a fogadásod. Nyertél {1} kreditet."
-		"chi" "你的Bet 为你赢得了 {1} credits."
+		"chi" "你的Bet 为你赢得了 {1} 积分。"
 	}
 
 	"Betting Lost"
@@ -2581,7 +2581,7 @@
 		"#format" "{1:d}"
 		"en" "You lost {1} credits on the bet."
 		"hu" "{1} kreditet vesztettél a fogadáson."
-		"chi" "你失去了 {1} credits 因为Bet."
+		"chi" "你失去了 {1} 积分因为Bet."
 	}
 
 	"Betting Invalid Team"
@@ -2596,7 +2596,7 @@
 		"#format" "{1:d}"
 		"en" "You have successfully placed a bet of {1} credits."
 		"hu" "Sikeresen fogadtál {1} kredit értékben."
-		"chi" "你成功放置Bet {1} credits."
+		"chi" "你成功放置Bet {1} 积分。"
 	}
 
 	"Betting Already Placed"
