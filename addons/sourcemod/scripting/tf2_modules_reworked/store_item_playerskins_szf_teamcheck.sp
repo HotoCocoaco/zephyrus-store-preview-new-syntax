@@ -5,7 +5,6 @@
 #include <morecolors>
 #include <tf2>
 #include <tf2_stocks>
-#include <saxtonhale>
 
 #include <store>
 #include <zephstocks>

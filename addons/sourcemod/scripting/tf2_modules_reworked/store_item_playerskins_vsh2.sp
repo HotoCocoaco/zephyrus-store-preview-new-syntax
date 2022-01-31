@@ -3,7 +3,6 @@
 #include <sdktools>
 #include <sdkhooks>
 #include <morecolors>
-#include <tf2>
 #include <tf2_stocks>
 #include <vsh2>
 
@@ -108,6 +107,16 @@ public void OnPluginStart()
 
 
 	HookEvent("player_spawn", PlayerSkins_PlayerSpawn);
+	TF2_SdkStartup();
+}
+
+Action OnPlayerModelTimer(const VSH2Player player)
+{
+	if (player.GetPropAny("bIsBoss"))
+		return Plugin_Continue;
+
+	PrintToServer("Player is not a boss!");
+	return Plugin_Stop;
 }
 
 public void Store_OnConfigExecuted(char[] prefix)
@@ -203,9 +212,10 @@ public int PlayerSkins_Remove(int client,int id)
 public Action PlayerSkins_PlayerSpawn(Event event,const char[] name,bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
-		if(!IsClientInGame(client) || !IsPlayerAlive(client) || !(2<=GetClientTeam(client)<=3))
+		if(!IsClientInGame(client) || !IsPlayerAlive(client) || !(2<=GetClientTeam(client)<=3) || client <= 0)
 			return Plugin_Continue;
 
 		float Delay = view_as<float>(g_eCvars[g_cvarSkinDelay].aCache);
@@ -230,6 +240,8 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	if (VSH2Player(client).GetPropAny("bIsBoss"))	//检查是否为VSH2的Boss。
 		return Plugin_Stop;
 
+	//PrintToServer("Ready to set model!");
+
 	int class = TF2_GetPlayerClassAsNumber(client)-1;
 	int m_iEquipped = Store_GetEquippedItem(client, "playerskin", class);
 	/*if(m_iEquipped < 0)
@@ -244,15 +256,19 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 
 void Store_SetClientModel(int client, const char[] model)
 {
-	if (VSH2Player(client).GetPropAny("bIsBoss"))
-		return;
-
 	SetVariantString(model);
 	AcceptEntityInput(client, "SetCustomModel");
 	SetEntProp(client, Prop_Send, "m_bCustomModelRotates", 0);
 	SetEntProp(client, Prop_Send, "m_bUseClassAnimations", 1);
 	SetEntProp(client, Prop_Send, "m_nBody", CalculateBodyGroups(client));
-	(GetClientTeam(client) == 2) ? EquipWearable(client, RED_sign) : EquipWearable(client, BLUE_sign);
+	if (TF2_GetClientTeam(client) == TFTeam_Red)
+	{
+		EquipWearable(client, RED_sign);
+	}
+	else if (TF2_GetClientTeam(client) == TFTeam_Blue)
+	{
+		EquipWearable(client, BLUE_sign);
+	}
 }
 
 public void Store_OnPreviewItem(int client, char[] type, int index)
@@ -447,14 +463,14 @@ stock TF2_EquipWearable(int client,int Ent)
 }
 stock bool TF2_SdkStartup()
 {
-	Handle hGameConf = LoadGameConfigFile("tf2items.randomizer");
+	Handle hGameConf = LoadGameConfigFile("tf2.utils.nosoop");
 	if (hGameConf == INVALID_HANDLE)
 	{
-		LogMessage("Couldn't load SDK functions (GiveWeapon). Make sure tf2items.randomizer.txt is in your gamedata folder! Restart server if you want wearable weapons.");
+		LogMessage("Couldn't load SDK functions (GiveWeapon). Make sure tf2.utils.nosoop.txt is in your gamedata folder! Restart server if you want wearable weapons.");
 		return false;
 	}
 	StartPrepSDKCall(SDKCall_Player);
-	PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, "CTFPlayer::EquipWearable");
+	PrepSDKCall_SetFromConf(hGameConf, SDKConf_Virtual, "CTFPlayer::EquipWearable()");
 	PrepSDKCall_AddParameter(SDKType_CBaseEntity, SDKPass_Pointer);
 	g_hSdkEquipWearable = EndPrepSDKCall();
 
