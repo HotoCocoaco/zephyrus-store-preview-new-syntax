@@ -110,15 +110,6 @@ public void OnPluginStart()
 	TF2_SdkStartup();
 }
 
-Action OnPlayerModelTimer(const VSH2Player player)
-{
-	if (player.GetPropAny("bIsBoss"))
-		return Plugin_Continue;
-
-	PrintToServer("Player is not a boss!");
-	return Plugin_Stop;
-}
-
 public void Store_OnConfigExecuted(char[] prefix)
 {
 	strcopy(g_sChatPrefix, sizeof(g_sChatPrefix), prefix);
@@ -238,6 +229,9 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 		return Plugin_Stop;
 
 	if (VSH2Player(client).GetPropAny("bIsBoss"))	//检查是否为VSH2的Boss。
+		return Plugin_Stop;
+
+	if (VSH2Player(client).GetPropAny("bIsMinion"))	//检查是否为VSH2的Boss。
 		return Plugin_Stop;
 
 	//PrintToServer("Ready to set model!");
