@@ -234,6 +234,9 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	if (VSH2Player(client).GetPropAny("bIsMinion"))	//检查是否为VSH2的Boss。
 		return Plugin_Stop;
 
+	if (VSH2Player(client).GetPropAny("bIsZombie"))	//检查是否为VSH2的Boss。
+		return Plugin_Stop;
+
 	//PrintToServer("Ready to set model!");
 
 	int class = TF2_GetPlayerClassAsNumber(client)-1;
