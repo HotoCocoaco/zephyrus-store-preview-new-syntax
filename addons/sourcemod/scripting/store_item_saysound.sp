@@ -2,7 +2,7 @@
  * Store - Sound item module
  * by: shanapu
  * https://github.com/shanapu/
- * 
+ *
  * Copyright (C) 2018-2019 Thomas Schmidt (shanapu)
  * Credits:
  * Contributer:
@@ -17,7 +17,7 @@
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, version 3.0, as published by the
  * Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
@@ -30,7 +30,7 @@
 #include <sourcemod>
 #include <sdktools>
 
-#include <colors> 
+#include <colors>
 #include <store>
 #include <zephstocks>
 
@@ -66,19 +66,19 @@ int g_iUses[MAXPLAYERS + 1] = {0,...};
  * Commit: https://github.com/shanapu/MyStore/commit/<COMMIT>
  */
 
-public Plugin myinfo = 
+public Plugin myinfo =
 {
 	name = "Store - Sound item module",
 	author = "shanapu, nuclear silo", // If you should change the code, even for your private use, please PLEASE add your name to the author here
 	description = "",
-	version = "1.1", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
+	version = "1.2", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
 	url = ""
 };
 
 public void OnPluginStart()
 {
 	Store_RegisterHandler("saysound", "sound", Sounds_OnMapStart, Sounds_Reset, Sounds_Config, Sounds_Equip, Sounds_Remove, false);
-	
+
 	g_iType = RegisterConVar("sm_store_saysound_type", "1", "Type of the max uses limit (0 = Map limit, 1 = Round limit)", TYPE_INT);
 	g_iMaxUses = RegisterConVar("sm_store_saysound_max_uses", "1", "Max uses", TYPE_INT);
 
@@ -109,6 +109,7 @@ public void OnMapStart()
 		g_iUses[i] = 0;
 		//}
 	}
+	//Sounds_OnMapStart();
 }
 
 public void Store_OnConfigExecuted(char[] prefix)
@@ -122,9 +123,9 @@ public void Sounds_OnMapStart()
 
 	for (int i = 0; i < g_iCount; i++)
 	{
-		PrecacheSound(g_sSound[i], true);
-		FormatEx(sBuffer, sizeof(sBuffer), "sound/%s", g_sSound[i]);
-		AddFileToDownloadsTable(sBuffer);
+			PrecacheSound(g_sSound[i], true);
+			FormatEx(sBuffer, sizeof(sBuffer), "sound/%s", g_sSound[i]);
+			AddFileToDownloadsTable(sBuffer);
 	}
 }
 
@@ -206,8 +207,16 @@ public int Sounds_Equip(int client, int itemid)
 			// Sound From global world
 			case 1:
 			{
-				EmitSoundToAll(g_sSound[iIndex], SOUND_FROM_WORLD, _, SNDLEVEL_RAIDSIREN, _, g_fVolume[iIndex]);
+				//EmitSoundToAll(g_sSound[iIndex], SOUND_FROM_WORLD, _, SNDLEVEL_RAIDSIREN, _, g_fVolume[iIndex]);
+				//EmitSoundToAll(g_sSound[iIndex], .volume = g_fVolume[iIndex]);
 				//g_iUses[client]++;
+				for(int target = 1; target<=MaxClients; target++)
+				{
+					if(IsClientInGame(target))
+					{
+						EmitSoundToClient(target, g_sSound[iIndex], .volume = g_fVolume[iIndex]);
+					}
+				}
 			}
 			// Sound From local player
 			case 2:
@@ -238,7 +247,7 @@ public int Sounds_Equip(int client, int itemid)
 		else CPrintToChat(client, "%s%t", g_sChatPrefix, "say sound round max uses", view_as<int>(g_eCvars[g_iMaxUses].aCache));
 	}
 	g_iSpam[client] = GetTime() + g_iCooldown[iIndex];
-	
+
 	//Store_SetClientPreviousMenu(client, MENU_PARENT);
 	Store_DisplayPreviousMenu(client);
 
@@ -304,7 +313,7 @@ public void Event_PlayerSay(Event event, char[] name, bool dontBroadcast)
 						EmitSoundToAll(g_sSound[i], client, SNDCHAN_VOICE, SNDLEVEL_NORMAL, SND_NOFLAGS, g_fVolume[i], SNDPITCH_NORMAL, client, fPos, fAgl, true);
 					}
 				}
-			
+
 				if (!Store_HasClientItem(client, g_iItemId[i]))
 				{
 					Store_SetClientCredits(client, credits - g_unPrice[i]);
@@ -328,7 +337,7 @@ public void Event_PlayerSay(Event event, char[] name, bool dontBroadcast)
 			break;
 		}
 	}*/
-	
+
 	for (int i = 0; i < g_iCount; i++)
 	{
 		if (strcmp(sBuffer, g_sTrigger[i]) == 0)
@@ -351,7 +360,14 @@ public void Event_PlayerSay(Event event, char[] name, bool dontBroadcast)
 						// Sound From global world
 						case 1:
 						{
-							EmitSoundToAll(g_sSound[i], SOUND_FROM_WORLD, _, SNDLEVEL_RAIDSIREN, _, g_fVolume[i]);
+							//EmitSoundToAll(g_sSound[i], SOUND_FROM_WORLD, _, SNDLEVEL_RAIDSIREN, _, g_fVolume[i]);
+							for(int target = 1; target<=MaxClients; target++)
+							{
+								if(IsClientInGame(target))
+								{
+									EmitSoundToClient(target, g_sSound[i], .volume = g_fVolume[i]);
+								}
+							}
 						}
 						// Sound From local player
 						case 2:
