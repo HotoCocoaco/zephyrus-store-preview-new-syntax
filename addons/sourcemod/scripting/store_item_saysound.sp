@@ -109,7 +109,7 @@ public void OnMapStart()
 		g_iUses[i] = 0;
 		//}
 	}
-	//Sounds_OnMapStart();
+	Sounds_OnMapStart();
 }
 
 public void Store_OnConfigExecuted(char[] prefix)
