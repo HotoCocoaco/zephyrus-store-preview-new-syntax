@@ -30,7 +30,7 @@
 #include <sourcemod>
 #include <sdktools>
 
-#include <colors>
+#include <multicolors>
 #include <store>
 #include <zephstocks>
 
