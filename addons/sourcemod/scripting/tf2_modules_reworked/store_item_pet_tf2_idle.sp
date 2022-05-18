@@ -9,7 +9,7 @@
 #include <store>
 #include <zephstocks>
 
-#include <morecolors>
+#include <multicolors>
 //#include <smartdm>
 
 #pragma semicolon 1

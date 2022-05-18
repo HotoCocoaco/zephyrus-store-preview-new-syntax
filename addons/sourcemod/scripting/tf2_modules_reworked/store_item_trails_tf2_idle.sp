@@ -7,7 +7,7 @@
 //#include <cstrike>
 #include <clientprefs>
 
-#include <morecolors>
+#include <multicolors>
 
 #include <store>
 #include <zephstocks>
