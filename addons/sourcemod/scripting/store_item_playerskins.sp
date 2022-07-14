@@ -11,6 +11,7 @@
 
 #pragma semicolon 1
 #pragma newdecls required
+#pragma dynamic 131072
 
 //new GAME_TF2 = false;
 native bool ZR_IsClientZombie(int client);
@@ -31,9 +32,19 @@ enum struct PlayerSkin
 	int nModelIndex;
 }
 
+enum struct PlayerArms
+{
+	char szModel[PLATFORM_MAX_PATH];
+	//int iSkin;
+	//int iBody;
+	int iTeam;
+}
+
 PlayerSkin g_ePlayerSkins[STORE_MAX_ITEMS];
+PlayerArms g_ePlayerArms[STORE_MAX_ITEMS];
 
 int g_iPlayerSkins = 0;
+int g_iPlayerArms = 0;
 //int g_iTempSkins[MAXPLAYERS+1];
 
 int g_cvarSkinChangeInstant = -1;
@@ -54,14 +65,14 @@ char g_sChatPrefix[128];
 bool GAME_CSGO = false;
 
 bool g_bHide[MAXPLAYERS + 1];
-Handle g_hHideCookie = INVALID_HANDLE;
+Cookie g_hHideCookie;
 
 public Plugin myinfo = 
 {
 	name = "Store - Player Skin Module (No ZR + ZR, gloves support)",
-	author = "nuclear silo", // If you should change the code, even for your private use, please PLEASE add your name to the author here
+	author = "nuclear silo, AiDN™", // If you should change the code, even for your private use, please PLEASE add your name to the author here
 	description = "",
-	version = "1.6", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
+	version = "1.9", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
 	url = ""
 }
 
@@ -76,6 +87,9 @@ public void OnPluginStart()
 		GAME_CSGO = true;
 	
 	Store_RegisterHandler("playerskin", "model", PlayerSkins_OnMapStart, PlayerSkins_Reset, PlayerSkins_Config, PlayerSkins_Equip, PlayerSkins_Remove, true);
+	Store_RegisterHandler("arms", "model", Arms_OnMapStart, Arms_Reset, Arms_Config, Arms_Equip, Arms_Remove, true);
+	
+	RegConsoleCmd("sm_hidegloves", Command_Hide, "Hides the Gloves");
 	
 	g_cvarSkinForceChange = RegisterConVar("sm_store_playerskin_force_default", "0", "If it's set to 1, default skins will be enforced.", TYPE_INT);
 	
@@ -90,7 +104,7 @@ public void OnPluginStart()
 	
 	g_cvarSkinChangeInstant = RegisterConVar("sm_store_playerskin_instant", "1", "Defines whether the skin should be changed instantly or on next spawn.", TYPE_INT);
 	
-	g_hHideCookie = RegClientCookie("PlayerSkin_Hide_Gloves_Cookie", "Cookie to check if Gloves are blocked", CookieAccess_Private);
+	g_hHideCookie = new Cookie("PlayerSkin_Hide_Gloves_Cookie", "Cookie to check if Gloves are blocked", CookieAccess_Private);
 	SetCookieMenuItem(PrefMenu, 0, "");
 	
 	HookEvent("player_spawn", PlayerSkins_PlayerSpawn);
@@ -119,57 +133,49 @@ public void OnPluginStart()
 	}
 }
 
-public void OnClientCookiesCached(int client)
-{
-	char sValue[8];
-	GetClientCookie(client, g_hHideCookie, sValue, sizeof(sValue));
-	
-
-	g_bHide[client] = (sValue[0] != '\0' && StringToInt(sValue));
-}
-
-
 public void PrefMenu(int client, CookieMenuAction actions, any info, char[] buffer, int maxlen)
 {
 	if (actions == CookieMenuAction_DisplayOption)
 	{
-		switch(g_bHide[client])
-		{
-			case false: FormatEx(buffer, maxlen, "Hide Gloves: Disabled");
-			case true: FormatEx(buffer, maxlen, "Hide Gloves: Enabled");
-		}
+		if (g_bHide[client])
+			FormatEx(buffer, maxlen, "%T", "Show gloves", client);
+		else
+			FormatEx(buffer, maxlen, "%T", "Hide gloves", client);
 	}
 
 	if (actions == CookieMenuAction_SelectOption)
 	{
-		//ClientCommand(client, "sm_hidepet");
-		CMD_Hide(client);
+		Command_Hide(client, 0);
 		ShowCookieMenu(client);
 	}
 }
 
-void CMD_Hide(int client)
+public void OnClientCookiesCached(int client)
 {
-	char sCookieValue[8];
+	char sValue[4];
+	g_hHideCookie.Get(client, sValue, sizeof(sValue));
 
-	switch(g_bHide[client])
+	if (sValue[0] == '\0' || sValue[0] == '0')
+		g_bHide[client] = false;
+	else
+		g_bHide[client] = true;
+}
+
+Action Command_Hide(int client, int args)
+{
+	g_bHide[client] = !g_bHide[client];
+	if (g_bHide[client])
 	{
-		case false:
-		{
-			g_bHide[client] = true;
-			IntToString(1, sCookieValue, sizeof(sCookieValue));
-			SetClientCookie(client, g_hHideCookie, sCookieValue);
-			CPrintToChat(client, "%s%t", g_sChatPrefix, "Item hidden", "gloves");
-
-		}
-		case true:
-		{
-			g_bHide[client] = false;
-			IntToString(0, sCookieValue, sizeof(sCookieValue));
-			SetClientCookie(client, g_hHideCookie, sCookieValue);
-			CPrintToChat(client, "%s%t", g_sChatPrefix, "Item visible", "gloves");
-		}
+		CPrintToChat(client, "%s%t", g_sChatPrefix, "Item hidden", "gloves");
+		g_hHideCookie.Set(client, "1");
 	}
+	else
+	{
+		CPrintToChat(client, "%s%t", g_sChatPrefix, "Item visible", "gloves");
+		g_hHideCookie.Set(client, "0");
+	}
+
+	return Plugin_Handled;
 }
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
@@ -234,7 +240,7 @@ public void PlayerSkins_OnMapStart()
 		g_bCTForcedSkin = false;
 }
 
-public int PlayerSkins_Reset()
+public void PlayerSkins_Reset()
 {
 	g_iPlayerSkins = 0;
 }
@@ -316,6 +322,61 @@ public int PlayerSkins_Remove(int client,int id)
 	return view_as<int>(g_ePlayerSkins[Store_GetDataIndex(id)].iTeam)-2;
 }
 
+public void Arms_OnMapStart()
+{
+	for(int i=0;i<g_iPlayerArms;++i)
+	{
+		PrecacheModel(g_ePlayerArms[i].szModel, true);
+		Downloader_AddFileToDownloadsTable(g_ePlayerArms[i].szModel);
+	}
+}
+
+public void Arms_Reset()
+{
+	g_iPlayerArms = 0;
+}
+
+public bool Arms_Config(Handle &kv, int itemid)
+{
+	Store_SetDataIndex(itemid, g_iPlayerArms);
+	
+	KvGetString(kv, "model", g_ePlayerArms[g_iPlayerArms].szModel, PLATFORM_MAX_PATH);
+	g_ePlayerArms[g_iPlayerArms].iTeam = KvGetNum(kv, "team");
+	
+	if(FileExists(g_ePlayerArms[g_iPlayerArms].szModel, true))
+	{
+		++g_iPlayerArms;
+		return true;
+	}
+	
+	return false;
+}
+
+public int Arms_Equip(int client, int id)
+{
+	int m_iData = Store_GetDataIndex(id);
+
+	if (g_ePlayerArms[m_iData].iTeam == 4)
+	{
+		Store_SetClientArmsModel(client, g_ePlayerArms[m_iData].szModel, m_iData);
+		CPrintToChat(client, " arms team 4");
+	}
+	else if(IsPlayerAlive(client) && IsValidClient(client, true) && GetClientTeam(client)==g_ePlayerArms[m_iData].iTeam)
+	{
+		Store_SetClientArmsModel(client, g_ePlayerArms[m_iData].szModel, m_iData);
+		CPrintToChat(client, " arms team 2,3");
+	}
+	else if(Store_IsClientLoaded(client))
+		CPrintToChat(client, "%s%t", g_sChatPrefix, "PlayerSkins Settings Changed");
+		
+	return (g_ePlayerArms[Store_GetDataIndex(id)].iTeam)-2;
+}
+
+public int Arms_Remove(int client,int id)
+{
+	return view_as<int>(g_ePlayerArms[Store_GetDataIndex(id)].iTeam)-2;
+}
+
 public Action PlayerSkins_PlayerSpawn(Event event,const char[] name,bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -327,10 +388,33 @@ public Action PlayerSkins_PlayerSpawn(Event event,const char[] name,bool dontBro
 		float Delay = view_as<float>(g_eCvars[g_cvarSkinDelay].aCache);
 		
 		CreateTimer(Delay, PlayerSkins_PlayerSpawnPost, GetClientUserId(client));
+		CreateTimer(Delay+1, Arms_PlayerSpawnPost, GetClientUserId(client)); // Settings Arms if Player Skin is equipped
 	}
 	else CPrintToChat(client, "%s%t", g_sChatPrefix, "Player Skin module disabled");
 	
 	return Plugin_Continue;
+}
+
+public Action Arms_PlayerSpawnPost(Handle timer, any userid)
+{
+	int client = GetClientOfUserId(userid);
+
+	if(!client || !IsClientInGame(client))
+		return Plugin_Stop;
+
+	if (IsValidClient(client, true) && !IsPlayerAlive(client))
+		return Plugin_Stop;
+		
+	int m_iEquipped = Store_GetEquippedItem(client, "arms", 2);
+	if(m_iEquipped < 0)
+		m_iEquipped = Store_GetEquippedItem(client, "arms", GetClientTeam(client)-2);
+	if(m_iEquipped >= 0)
+	{
+		int m_iData = Store_GetDataIndex(m_iEquipped);
+		Store_SetClientArmsModel(client, g_ePlayerArms[m_iData].szModel, m_iData);
+	}
+	
+	return Plugin_Stop;
 }
 
 public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
@@ -379,6 +463,12 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 		}
 	}
 	return Plugin_Stop;
+}
+
+void Store_SetClientArmsModel(int client, const char[] model, int index)
+{
+	if(index){}
+	SetEntPropString(client, Prop_Send, "m_szArmsModel", model);
 }
 
 void Store_SetClientModel(int client, const char[] model, const int skin=0, const int body=0, const char[] arms="", int index)
@@ -473,87 +563,96 @@ int GetEquippedSkin(int client)
 
 public void Store_OnPreviewItem(int client, char[] type, int index)
 {
-	if (!StrEqual(type, "playerskin"))
-		return;
+	//if (!StrEqual(type, "playerskin"))
+	//	return;
 		
 	if(g_hTimerPreview[client] != null) 
 		TriggerTimer(g_hTimerPreview[client], false);
 
-	int iPreview = CreateEntityByName("prop_dynamic_override"); //prop_physics_multiplayer
-	
-	if (g_hTimerPreview[client] != null) 
+	if (StrEqual(type, "playerskin") || StrEqual(type, "arms"))
 	{
-        delete g_hTimerPreview[client];
-        g_hTimerPreview[client] = null;
-	} 
+		int iPreview = CreateEntityByName("prop_dynamic_override"); //prop_physics_multiplayer
+		
+		if (g_hTimerPreview[client] != null) 
+		{
+			delete g_hTimerPreview[client];
+			g_hTimerPreview[client] = null;
+		} 
 
-	DispatchKeyValue(iPreview, "spawnflags", "64");
-	DispatchKeyValue(iPreview, "model", g_ePlayerSkins[index].szModel);
+		DispatchKeyValue(iPreview, "spawnflags", "64");
+		if(StrEqual(type, "playerskin"))
+			DispatchKeyValue(iPreview, "model", g_ePlayerSkins[index].szModel);
+		else if(StrEqual(type, "arms"))
+			DispatchKeyValue(iPreview, "model", g_ePlayerArms[index].szModel);
+			
+		DispatchSpawn(iPreview);
 
-	DispatchSpawn(iPreview);
+		SetEntProp(iPreview, Prop_Send, "m_CollisionGroup", 11);
 
-	SetEntProp(iPreview, Prop_Send, "m_CollisionGroup", 11);
+		AcceptEntityInput(iPreview, "Enable");
 
-	AcceptEntityInput(iPreview, "Enable");
+		SetEntProp(iPreview, Prop_Send, "m_nSkin", g_ePlayerSkins[index].iSkin);
+		if (g_ePlayerSkins[index].iBody > 0)
+		{
+			SetEntProp(iPreview, Prop_Send, "m_nBody", g_ePlayerSkins[index].iBody);
+		}
+		
+		//Only CSGO support for GLOWING preview model
+		if(GAME_CSGO)
+		{
+			int offset = GetEntSendPropOffs(iPreview, "m_clrGlow");
+			SetEntProp(iPreview, Prop_Send, "m_bShouldGlow", true, true);
+			SetEntProp(iPreview, Prop_Send, "m_nGlowStyle", 0);
+			SetEntPropFloat(iPreview, Prop_Send, "m_flGlowMaxDist", 2000.0);
 
-	SetEntProp(iPreview, Prop_Send, "m_nSkin", g_ePlayerSkins[index].iSkin);
-	if (g_ePlayerSkins[index].iBody > 0)
-	{
-		SetEntProp(iPreview, Prop_Send, "m_nBody", g_ePlayerSkins[index].iBody);
+			// Miku green
+			SetEntData(iPreview, offset, 57, _, true);
+			SetEntData(iPreview, offset + 1, 197, _, true);
+			SetEntData(iPreview, offset + 2, 187, _, true);
+			SetEntData(iPreview, offset + 3, 155, _, true);
+		}
+
+		float fOrigin[3], fAngles[3], fRad[2], fPosition[3];
+
+		GetClientAbsOrigin(client, fOrigin);
+		GetClientAbsAngles(client, fAngles);
+
+		fRad[0] = DegToRad(fAngles[0]);
+		fRad[1] = DegToRad(fAngles[1]);
+
+		fPosition[0] = fOrigin[0] + 64 * Cosine(fRad[0]) * Cosine(fRad[1]);
+		fPosition[1] = fOrigin[1] + 64 * Cosine(fRad[0]) * Sine(fRad[1]);
+		fPosition[2] = fOrigin[2] + 4 * Sine(fRad[0]);
+
+		fAngles[0] *= -1.0;
+		fAngles[1] *= -1.0;
+
+		if(StrEqual(type, "playerskin"))
+			fPosition[2] += 5;
+		else if(StrEqual(type, "arms"))
+			fPosition[2] += 45;
+
+		TeleportEntity(iPreview, fPosition, fAngles, NULL_VECTOR);
+
+		g_iPreviewEntity[client] = EntIndexToEntRef(iPreview);
+
+		int iRotator = CreateEntityByName("func_rotating");
+		DispatchKeyValueVector(iRotator, "origin", fPosition);
+
+		DispatchKeyValue(iRotator, "maxspeed", "20");
+		DispatchKeyValue(iRotator, "spawnflags", "64");
+		DispatchSpawn(iRotator);
+
+		SetVariantString("!activator");
+		AcceptEntityInput(iPreview, "SetParent", iRotator, iRotator);
+		AcceptEntityInput(iRotator, "Start");
+
+		SDKHook(iPreview, SDKHook_SetTransmit, Hook_SetTransmit_Preview);
+
+		g_hTimerPreview[client] = CreateTimer(45.0, Timer_KillPreview, client);
+
+		CPrintToChat(client, "%s%t", g_sChatPrefix, "Spawn Preview", client);
 	}
-	
-	//Only CSGO support for GLOWING preview model
-	if(GAME_CSGO)
-	{
-		int offset = GetEntSendPropOffs(iPreview, "m_clrGlow");
-		SetEntProp(iPreview, Prop_Send, "m_bShouldGlow", true, true);
-		SetEntProp(iPreview, Prop_Send, "m_nGlowStyle", 0);
-		SetEntPropFloat(iPreview, Prop_Send, "m_flGlowMaxDist", 2000.0);
-
-		// Miku green
-		SetEntData(iPreview, offset, 57, _, true);
-		SetEntData(iPreview, offset + 1, 197, _, true);
-		SetEntData(iPreview, offset + 2, 187, _, true);
-		SetEntData(iPreview, offset + 3, 155, _, true);
-	}
-
-	float fOrigin[3], fAngles[3], fRad[2], fPosition[3];
-
-	GetClientAbsOrigin(client, fOrigin);
-	GetClientAbsAngles(client, fAngles);
-
-	fRad[0] = DegToRad(fAngles[0]);
-	fRad[1] = DegToRad(fAngles[1]);
-
-	fPosition[0] = fOrigin[0] + 64 * Cosine(fRad[0]) * Cosine(fRad[1]);
-	fPosition[1] = fOrigin[1] + 64 * Cosine(fRad[0]) * Sine(fRad[1]);
-	fPosition[2] = fOrigin[2] + 4 * Sine(fRad[0]);
-
-	fAngles[0] *= -1.0;
-	fAngles[1] *= -1.0;
-
-	fPosition[2] += 5;
-
-	TeleportEntity(iPreview, fPosition, fAngles, NULL_VECTOR);
-
-	g_iPreviewEntity[client] = EntIndexToEntRef(iPreview);
-
-	int iRotator = CreateEntityByName("func_rotating");
-	DispatchKeyValueVector(iRotator, "origin", fPosition);
-
-	DispatchKeyValue(iRotator, "maxspeed", "20");
-	DispatchKeyValue(iRotator, "spawnflags", "64");
-	DispatchSpawn(iRotator);
-
-	SetVariantString("!activator");
-	AcceptEntityInput(iPreview, "SetParent", iRotator, iRotator);
-	AcceptEntityInput(iRotator, "Start");
-
-	SDKHook(iPreview, SDKHook_SetTransmit, Hook_SetTransmit_Preview);
-
-	g_hTimerPreview[client] = CreateTimer(45.0, Timer_KillPreview, client);
-
-	CPrintToChat(client, "%s%t", g_sChatPrefix, "Spawn Preview", client);
 }
 
 public Action Hook_SetTransmit_Preview(int ent, int client)
