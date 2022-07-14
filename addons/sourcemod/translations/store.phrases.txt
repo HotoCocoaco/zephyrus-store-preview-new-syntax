@@ -1,5 +1,112 @@
 ﻿"Phrases"
 {
+	"Show trails"
+	{
+		"en"		"Show trails"
+	}
+
+	"Hide trails"
+	{
+		"en"		"Hide trails"
+	}
+
+	"Show bullet tracer"
+	{
+		"en"		"Show bullet tracers"
+	}
+
+	"Hide bullet tracer"
+	{
+		"en"		"Hide bullet tracers"
+	}
+
+	"Show gloves"
+	{
+		"en"		"Show gloves"
+	}
+
+	"Hide gloves"
+	{
+		"en"		"Hide gloves"
+	}
+
+	"Show pets"
+	{
+		"en"		"Show pets"
+	}
+
+	"Hide pets"
+	{
+		"en"		"Hide pets"
+	}
+
+	"Show bullet sparks
+	{
+		"en"		"Show bullet sparks"
+	}
+
+	"Hide bullet sparks"
+	{
+		"en"		"Hide bullet sparks"
+	}
+
+	"Show paintball"
+	{
+		"en"		"Show paintballs"
+	}
+
+	"Hide paintball"
+	{
+		"en"		"Hide paintballs"
+	}
+
+	"Show particles"
+	{
+		"en"		"Show particles"
+	}
+
+	"Hide particles"
+	{
+		"en"		"Hide particles"
+	}
+
+	"arms"
+	{
+		"en" "arms"
+	}
+
+	"gloves"
+	{
+		"en" "gloves"
+	}
+
+	"Volume set"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"{green}{1} {default}volume set to {purple}{2}"
+		"fr"		"Volume {green}{1} {default}réglé à {purple}{2}"
+	}
+
+	"CP Chat Tag Color Option"
+	{
+		"en"	"Chat tag color option"
+	}
+
+	"CP Disable Color - Menu"
+	{
+		"en"	"Disable color"
+	}
+
+	"CP Changed color"
+	{
+		"en"		"You changed your color to: "
+	}
+
+	"CP Scoreboard Preview"
+	{
+		"en"		"Showing preview scoreboard tag, please press TAB button."
+	}
+
 	"CP Disabled Color"
 	{
 		"en" "Custom tag color disabled."
@@ -812,6 +919,12 @@
 	{
 		"en"		"Playing preview sound for you."
 		"chi"		"为你播放预览声音。"
+	}
+
+	"Spawn Preview - Colored smoke"
+	{
+		"#format"	"{1:.0f}"
+		"en"		"Spawned a preview. Preview will disappear in {1} seconds."
 	}
 
 	"Parachute Reloaded"
@@ -2160,7 +2273,7 @@
 
 	"inv and inv credits"
 	{
-		"#format"	"{1:i},{2:s},{3:i},{4:s},{5:i},{6:s},"
+		"#format"	"{1:i},{2:s},{3:i},{4:s},{5:i},{6:s}"
 		"en"		"    {1}. {2}:   {3} {4} ({5} {6})"
 	}
 
