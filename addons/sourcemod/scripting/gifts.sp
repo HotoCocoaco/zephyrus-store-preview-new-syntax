@@ -9,7 +9,7 @@
 //Pragma
 #pragma semicolon 1
 #pragma newdecls required
-#pragma dynamic 131072 
+#pragma dynamic 131072
 
 enum struct Module
 {
@@ -63,13 +63,13 @@ public void OnPluginStart()
 
 	HookEvent("player_death", Event_PlayerDeath);
 	HookEvent("round_start", Event_RoundStart);
-	
+
 	g_cvarChance = RegisterConVar("sm_gifts_chance", "0.60", "Chance that a gift will be spawned upon player death.", TYPE_FLOAT, INVALID_FUNCTION, 0, true, 0.0, true, 1.0);
 	g_cvarLifetime = RegisterConVar("sm_gifts_lifetime", "10.0", "Lifetime of the gift.", TYPE_FLOAT);
 
 	char m_szGameDir[64];
 	GetGameFolderName(STRING(m_szGameDir));
-	
+
 	if(strcmp(m_szGameDir, "cstrike")==0 || strcmp(m_szGameDir, "csgo")==0)
 		g_cvarModel = RegisterConVar("sm_gifts_model", "models/items/cs_gift.mdl", "Model file for the gift", TYPE_STRING);
 	else if(strcmp(m_szGameDir, "dod")==0)
@@ -78,7 +78,7 @@ public void OnPluginStart()
 		g_cvarModel = RegisterConVar("sm_gifts_model", "models/items/tf_gift.mdl", "Model file for the gift", TYPE_STRING);
 	else
 		g_cvarModel = RegisterConVar("sm_gifts_model", "<you should set some gift model>", "Model file for the gift", TYPE_STRING);
-	
+
 	g_cvarSize = CreateConVar("sm_gifts_size", "0", "0 = Normal collision\nany integer = Size of the gift collision box in hammer/csgo units (collision fix)\nTry default collision, and use the fix if needed.\nFor csgo, this should be set to 20.", _, true, 0.0);
 
 	AutoExecConfig();
@@ -114,9 +114,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	CreateNative("Gifts_SetClientCondition", Native_SetClientCondition);
 	CreateNative("Gifts_GetClientCondition", Native_GetClientCondition);
 	CreateNative("Gifts_SpawnGift", Native_SpawnGift);
-	
+
 	gF_OnClientGrabGift = CreateGlobalForward("Gifts_OnClientGrabGift", ET_Event, Param_Cell, Param_Cell);
-	
+
 	RegPluginLibrary("gifts");
 
 	return APLRes_Success;
@@ -133,7 +133,7 @@ public int Native_RegisterPlugin(Handle plugin, int numParams)
 		return 0;
 
 	PushArrayArray(g_hPlugins, m_szModule);
-	
+
 	return 1;
 }
 
@@ -193,8 +193,11 @@ public int Native_SpawnGift(Handle plugin, int numParams)
 public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	
+
 	if(!g_bEnabled)
+		return Plugin_Continue;
+
+	if (GameRules_GetRoundState() != RoundState_RoundRunning)
 		return Plugin_Continue;
 
 	if(view_as<float>(g_eCvars[g_cvarChance].aCache)>0.0)
@@ -212,14 +215,14 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 			Stock_SpawnGift(pos, g_eCvars[g_cvarModel].sCache, view_as<float>(g_eCvars[g_cvarLifetime].aCache));
 		}
 	}
-	
+
 	return Plugin_Continue;
 }
 
 public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	int curTime = GetTime();
-	
+
 	for(int i=0;i<2048;++i)
 		if(g_eSpawnedGifts[i].hPlugin)
 		{
@@ -230,13 +233,13 @@ public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadca
 				g_eSpawnedGifts[i].fnCallback = INVALID_FUNCTION;
 				continue;
 			}
-			
+
 			// ugh......
 			float m_fPosition[3];
 			m_fPosition[0] = g_eSpawnedGifts[i].fPosition[0];
 			m_fPosition[1] = g_eSpawnedGifts[i].fPosition[1];
 			m_fPosition[2] = g_eSpawnedGifts[i].fPosition[2];
-			
+
 			int m_iIndex = Stock_SpawnGift(m_fPosition, g_eSpawnedGifts[i].szModel, view_as<float>(g_eSpawnedGifts[i].iDieTimestamp - curTime));
 			// logmessage("Event_RoundStart gift spawn @ %f %f %f - lifetime: %f - %f %f %f", m_fPosition[0], m_fPosition[1], m_fPosition[2], float(g_eSpawnedGifts[i][iDieTimestamp] - curTime), g_eSpawnedGifts[i][fPosition][0], g_eSpawnedGifts[i][fPosition][1], g_eSpawnedGifts[i][fPosition][2]);
 
@@ -271,7 +274,7 @@ public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadca
 			g_eSpawnedGifts[i].bStay = g_eSpawnedGiftsTemp[i].bStay;
 			g_eSpawnedGifts[i].iDieTimestamp = g_eSpawnedGiftsTemp[i].iDieTimestamp;
 			strcopy(g_eSpawnedGifts[i].szModel, PLATFORM_MAX_PATH, g_eSpawnedGiftsTemp[i].szModel);
-			
+
 			// Avoids duplicating gifts
 			g_eSpawnedGiftsTemp[i].hPlugin = INVALID_HANDLE;
 			g_eSpawnedGiftsTemp[i].fnCallback = INVALID_FUNCTION;
@@ -305,14 +308,14 @@ stock int Stock_SpawnGift(float position[3], const char[] model, float lifetime)
 		}
 		DispatchKeyValue(m_iGift, "targetname", targetname);
 		DispatchSpawn(m_iGift);
-		
+
 		SetEntProp(m_iGift, Prop_Send, "m_CollisionGroup", 1);
-		
+
 		if (g_cvarSize.BoolValue)
 		{
 			// Custom parameters
 			SetEntProp(m_iGift, Prop_Send, "m_usSolidFlags", 12); // old: 8 - changed to 12 to prevent solid errors, and added a collision fix below
-			
+
 			// collision fix by azalty
 			SetEntProp(m_iGift, Prop_Send, "m_nSolidType", 2); // Bounding Box
 			float halfSize = g_cvarSize.FloatValue / 2.0;
@@ -335,7 +338,7 @@ stock int Stock_SpawnGift(float position[3], const char[] model, float lifetime)
 			// Default collision and parameters
 			SetEntProp(m_iGift, Prop_Send, "m_usSolidFlags", 8);
 		}
-		
+
 		if(lifetime > 0.0)
 		{
 			Format(m_szModule, sizeof(m_szModule), "OnUser1 !self:kill::%0.2f:-1", lifetime);
@@ -343,9 +346,9 @@ stock int Stock_SpawnGift(float position[3], const char[] model, float lifetime)
 			AcceptEntityInput(m_iGift, "AddOutput");
 			AcceptEntityInput(m_iGift, "FireUser1");
 		}
-	
+
 		TeleportEntity(m_iGift, position, NULL_VECTOR, NULL_VECTOR);
-		
+
 		if(!g_bTF)
 		{
 			int m_iRotator = CreateEntityByName("func_rotating");
@@ -357,7 +360,7 @@ stock int Stock_SpawnGift(float position[3], const char[] model, float lifetime)
 			DispatchKeyValue(m_iRotator, "solid", "0");
 			DispatchKeyValue(m_iRotator, "spawnflags", "64");
 			DispatchSpawn(m_iRotator);
-			
+
 			SetVariantString("!activator");
 			AcceptEntityInput(m_iGift, "SetParent", m_iRotator, m_iRotator);
 			AcceptEntityInput(m_iRotator, "Start");
@@ -368,7 +371,7 @@ stock int Stock_SpawnGift(float position[3], const char[] model, float lifetime)
 				AcceptEntityInput(m_iRotator, "AddOutput");
 				AcceptEntityInput(m_iRotator, "FireUser1");
 			}
-			
+
 			SetEntPropEnt(m_iGift, Prop_Send, "m_hEffectEntity", m_iRotator);
 		}
 
@@ -393,7 +396,7 @@ public Action OnStartTouch(int m_iGift, int client)
 	if(g_eSpawnedGifts[m_iGift].hPlugin != INVALID_HANDLE)
 		if(g_eSpawnedGifts[m_iGift].iOwner == client)
 			return Plugin_Handled;
-	
+
 	Action result = Plugin_Continue;
 	Call_StartForward(gF_OnClientGrabGift);
 	Call_PushCell(client);
@@ -419,16 +422,16 @@ public Action OnStartTouch(int m_iGift, int client)
 	else if(GetArraySize(g_hPlugins)!=0)
 	{
 		int id = GetRandomInt(0, GetArraySize(g_hPlugins)-1);
-		
+
 		Module m_szModule;
 		GetArrayArray(g_hPlugins, id, m_szModule);
-		
+
 		Call_StartFunction(m_szModule.hPlugin_Module, m_szModule.fnCallback_Module);
 		Call_PushCell(client);
 		Call_PushCell(m_iGift);
 		Call_Finish();
 	}
-	
+
 	return Plugin_Continue;
 }
 
