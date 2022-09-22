@@ -35,6 +35,8 @@
 #include <store>
 #include <zephstocks>
 
+#include <clientprefs>
+
 //#include <smartdm>
 
 #pragma semicolon 1
@@ -60,6 +62,9 @@ int g_iType;
 int g_iMaxUses;
 
 int g_iUses[MAXPLAYERS + 1] = {0,...};
+
+int g_iDisableSaysound[MAXPLAYERS + 1];
+Cookie g_saysound_cookie;
 
 /*
  * Build date: <DATE>
@@ -88,6 +93,52 @@ public void OnPluginStart()
 	HookEvent("player_say", Event_PlayerSay);
 	//HookEvent("round_end", Reset_Count ,EventHookMode_Pre);
 	HookEvent("teamplay_round_start", Reset_Count);
+
+	RegConsoleCmd("sm_hidesaysound", Command_HideSaysound, "Hide the store saysound.");
+
+	g_saysound_cookie = new Cookie("store_saysound", "Cookie to disable saysound", CookieAccess_Public);
+}
+
+public void OnClientPutInServer(int client)
+{
+	if ( AreClientCookiesCached(client) )
+	{
+		char setting[1];	g_saysound_cookie.Get(client, setting, sizeof(setting));
+		if (!setting[0])
+		{
+			strcopy(setting, sizeof(setting), "0");
+			g_saysound_cookie.Set(client, "0");
+		}
+		// this cookie will only store 1 & 0
+		g_iDisableSaysound[client] = StringToInt(setting);
+	}
+}
+
+Action Command_HideSaysound(int client, int args)
+{
+	if ( client < 1 || client > MaxClients || !IsClientInGame(client) )
+		return Plugin_Handled;
+
+	if ( !AreClientCookiesCached(client) )
+		return Plugin_Handled;
+
+	switch(g_iDisableSaysound[client])
+	{
+	  case 1:
+		{
+			g_iDisableSaysound[client] = 0;
+			g_saysound_cookie.Set(client, "0");
+			CPrintToChat(client, "{unique}[Coffee] {default}你已设置{green}播放{default}聊天音效。");
+		}
+		case 0:
+		{
+			g_iDisableSaysound[client] = 1;
+			g_saysound_cookie.Set(client, "1");
+			CPrintToChat(client, "{unique}[Coffee] {default}你已设置{red}隐藏{default}聊天音效。");
+		}
+	}
+
+	return Plugin_Handled;
 }
 
 public void Reset_Count(Handle event , const char[] name , bool dontBroadcast)
@@ -213,7 +264,7 @@ public int Sounds_Equip(int client, int itemid)
 				//g_iUses[client]++;
 				for(int target = 1; target<=MaxClients; target++)
 				{
-					if(IsClientInGame(target))
+					if(IsClientInGame(target) && !g_iDisableSaysound[target])
 					{
 						EmitSoundToClient(target, g_sSound[iIndex], .volume = g_fVolume[iIndex]);
 					}
@@ -364,7 +415,7 @@ public void Event_PlayerSay(Event event, char[] name, bool dontBroadcast)
 							//EmitSoundToAll(g_sSound[i], SOUND_FROM_WORLD, _, SNDLEVEL_RAIDSIREN, _, g_fVolume[i]);
 							for(int target = 1; target<=MaxClients; target++)
 							{
-								if(IsClientInGame(target))
+								if(IsClientInGame(target) && !g_iDisableSaysound[target])
 								{
 									EmitSoundToClient(target, g_sSound[i], .volume = g_fVolume[i]);
 								}
@@ -391,7 +442,7 @@ public void Event_PlayerSay(Event event, char[] name, bool dontBroadcast)
 						}
 					}
 
-
+					CPrintToChatAll("{yellow}[Coffee] {default}%N 使用聊天音效 {olive}%s", client, g_sTrigger[i]);
 					g_iSpam[client] = GetTime() + g_iCooldown[i];
 					g_iUses[client]++;
 				}
