@@ -9,6 +9,7 @@
 
 #include <multicolors> 
 //#include <smartdm>
+#include <tf2_stocks>
 
 #pragma semicolon 1
 #pragma newdecls required
@@ -330,6 +331,8 @@ public void PetThink(int client)
 		return;
 	}
 
+	if (ShouldHidePet(client))	return;
+
 	float pos[3];
 	float ang[3];
 	float clientPos[3];
@@ -573,4 +576,10 @@ public Action Timer_KillPreview(Handle timer, int client)
 	g_iPreviewEntity[client] = INVALID_ENT_REFERENCE;
 
 	return Plugin_Stop;
+}
+
+bool ShouldHidePet(int client)
+{
+	if ( TF2_IsPlayerInCondition(client, TFCond_Cloaked) || TF2_IsPlayerInCondition(client, TFCond_Disguised) || TF2_IsPlayerInCondition(client, TFCond_StealthedUserBuffFade) )	return true;
+	else	return false;
 }
