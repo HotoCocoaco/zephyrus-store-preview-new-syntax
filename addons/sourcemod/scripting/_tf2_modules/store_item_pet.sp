@@ -20,6 +20,7 @@ char g_sIdle[STORE_MAX_ITEMS][64];
 char g_sIdle2[STORE_MAX_ITEMS][64];
 float g_fPosition[STORE_MAX_ITEMS][3];
 float g_fAngles[STORE_MAX_ITEMS][3];
+float g_fScale[STORE_MAX_ITEMS];
 
 char g_sChatPrefix[128];
 
@@ -140,6 +141,7 @@ public bool Pets_Config(KeyValues &kv, int itemid)
 	kv.GetString("run", g_sRun[g_iCount], 64);
 	kv.GetVector("position", g_fPosition[g_iCount]);
 	kv.GetVector("angles", g_fAngles[g_iCount]);
+	g_fScale[g_iCount] = kv.GetFloat("modelscale", 1.00);
 	g_iCount++;
 
 	return true;
@@ -287,6 +289,12 @@ void CreatePet(int client)
 		DispatchKeyValue(iEntity, "spawnflags", "256");
 		DispatchKeyValue(iEntity, "solid", "0");
 		SetEntPropEnt(iEntity, Prop_Send, "m_hOwnerEntity", client);
+
+		// 放大缩小模型
+		if (g_fScale[iIndex] > 0.00 && g_fScale[iIndex] != 1.00)
+		{
+			SetEntPropFloat(iEntity, Prop_Send, "m_flModelScale", g_fScale[iIndex]);
+		}
 
 		DispatchSpawn(iEntity);
 		AcceptEntityInput(iEntity, "TurnOn", iEntity, iEntity, 0);
