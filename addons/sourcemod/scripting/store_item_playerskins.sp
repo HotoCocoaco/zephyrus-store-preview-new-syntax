@@ -70,9 +70,9 @@ Cookie g_hHideCookie;
 public Plugin myinfo = 
 {
 	name = "Store - Player Skin Module (No ZR + ZR, gloves support)",
-	author = "nuclear silo, AiDN™", // If you should change the code, even for your private use, please PLEASE add your name to the author here
+	author = "nuclear silo, AiDN™, azalty", // If you should change the code, even for your private use, please PLEASE add your name to the author here
 	description = "",
-	version = "1.9", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
+	version = "2.2", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
 	url = ""
 }
 
@@ -277,9 +277,8 @@ public int PlayerSkins_Equip(int client, int id)
 			if (g_eCvars[g_cvarSkinChangeInstant].aCache && g_ePlayerSkins[m_iData].iTeam == 4)
 			{
 				Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel, g_ePlayerSkins[m_iData].iSkin, g_ePlayerSkins[m_iData].iBody, g_ePlayerSkins[m_iData].szArms, m_iData);
-			
 			}
-			else if(IsPlayerAlive(client) && IsValidClient(client, true) && GetClientTeam(client)==g_ePlayerSkins[m_iData].iTeam)
+			else if(IsValidClient(client, true) && IsPlayerAlive(client) && GetClientTeam(client)==g_ePlayerSkins[m_iData].iTeam && g_eCvars[g_cvarSkinChangeInstant].aCache)
 			{
 				Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel, g_ePlayerSkins[m_iData].iSkin, g_ePlayerSkins[m_iData].iBody, g_ePlayerSkins[m_iData].szArms, m_iData);
 			}
@@ -288,7 +287,7 @@ public int PlayerSkins_Equip(int client, int id)
 		}
 		else // ZR MODE
 		{
-			if(IsPlayerAlive(client) && IsValidClient(client, true) && !ZR_IsClientZombie(client)) //&& GetClientTeam(client)==g_ePlayerSkins[m_iData][iTeam])
+			if(IsValidClient(client, true) && IsPlayerAlive(client) && !ZR_IsClientZombie(client) && g_eCvars[g_cvarSkinChangeInstant].aCache) //&& GetClientTeam(client)==g_ePlayerSkins[m_iData][iTeam])
 			{
 				Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel, g_ePlayerSkins[m_iData].iSkin, g_ePlayerSkins[m_iData].iBody, g_ePlayerSkins[m_iData].szArms, m_iData);
 			}
@@ -303,9 +302,10 @@ public int PlayerSkins_Equip(int client, int id)
 
 public int PlayerSkins_Remove(int client,int id)
 {
+	int m_iData = Store_GetDataIndex(id);
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
-		if (Store_IsClientLoaded(client) && IsValidClient(client, true) && IsPlayerAlive(client) && IsClientInGame(client))
+		if (Store_IsClientLoaded(client) && IsValidClient(client, true) && IsPlayerAlive(client) && IsClientInGame(client) && g_eCvars[g_cvarSkinChangeInstant].aCache && (g_ePlayerSkins[m_iData].iTeam == 4 || GetClientTeam(client)==g_ePlayerSkins[m_iData].iTeam))
 		{
 			// ZR MODE
 			if(g_bZombieMode)
@@ -473,19 +473,20 @@ void Store_SetClientArmsModel(int client, const char[] model, int index)
 
 void Store_SetClientModel(int client, const char[] model, const int skin=0, const int body=0, const char[] arms="", int index)
 {
-
 	SetEntityModel(client, model);
 
 	SetEntProp(client, Prop_Send, "m_nSkin", skin);
 	
-	if (body > 0)
+	if (body >= 0)
     {
         // set?
 		SetEntProp(client, Prop_Send, "m_nBody", body);
     }
+	else SetEntProp(client, Prop_Send, "m_nBody", 0);
 	
 	//CreateTimer(0.15, Timer_RemovePlayerWeapon, GetClientUserId(client));
 	
+
 	if(GAME_CSGO && arms[0]!=0)
 	{
 		if(!g_bGlovesPluginEnable)
@@ -503,6 +504,15 @@ void Store_SetClientModel(int client, const char[] model, const int skin=0, cons
 			RemoveClientGloves(client, index);
 			SetEntPropString(client, Prop_Send, "m_szArmsModel", arms);
 		}
+		
+		//Create Fake event to refresh the arm if the current model is the same because changing bodygroup
+		Event event = CreateEvent("player_spawn", true);
+		if (event == null)
+			return;
+
+		event.SetInt("userid", GetClientUserId(client));
+		event.FireToClient(client);
+		event.Cancel();
 	}
 }
 

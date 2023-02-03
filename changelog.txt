@@ -1,0 +1,146 @@
+================================================================================================================================
+================================================================================================================================
+=======================			What updates/files change will be listed here		================================
+================================================================================================================================
+================================================================================================================================
+
+#Format rules: since I live in Viet Nam so the date format in here is DD/MM/YYYY not MM/DD/YYYY
+================================================================================================================================
+################################################################################################
+Update 3/2/2023 (Thanks for you guy keep updating/fixing this store and maintain this project.)
+- Merge Pull Request from #93 to #137 (Check https://github.com/nuclearsilo583/zephyrus-store-preview-new-syntax/pull/) ( by azalty and Kroytz. Thanks :) )
+- Fixed gifts store module ignoring sm_store_gifts_enabled (by azalty)
+- Fixed items being removed in a certain scenario (by azalty)
+- Fixed problems with Native_SetClientCredits. (by azalty)
+- Changed handling of restricted items when players don't have access to them anymore. (by azalty)
+- Fixed load queries going through map changes. (by azalty)
+- Change Chat Processor behavior on stripping rainbow string. Added rainbow tag support in !tgs.
+- Fixed arms model not refresh by equiping the same model skin (with different bodygroup)
+################################################################################################
+Files changes:
+- store_combine.sp (v7.0.7 --> v7.1.1)
+- store.sp (v7.0.7 --> v7.1.1)
+- Splited core include files 
+	- scripting/store/cvars.sp
+	- scripting/store/natives.sp
+	- scripting/store/sql.sp
+	- scripting/store/store_functions.sp
+	- scripting/store/menus/item_menu.sp
+	- scripting/store/menus/preview_menu.sp
+- gift.sp
+- store_item_cpsupport.sp
+- store_item_playerskins.sp
+
+################################################################################################
+Update 28/8/2022
+- Re-add store core combined version (no splited files). This version and store.sp are the same and will be both updated by the time being.
+- Fix store-trade and store.phrases (Pull request #105 https://github.com/nuclearsilo583/zephyrus-store-preview-new-syntax/pull/105)
+- Update translations phrases for private custom weapon model shooting sound modules.
+################################################################################################
+Files changes:
+- store.sp / store_combine.sp (v7.0.7 --> v7.0.8)
+- store-trade.sp
+- store_misc_voucher.sp (v2.1 --> v2.2)
+- store.phrases.txt
+- Splited core include files 
+	- scripting/store/commands.sp
+	- scripting/store/db.sp
+	- scripting/store/menus/menu_handler.sp
+	- scripting/store/store_functions.sp
+	- scripting/store_misc_voucher.sp
+
+Which files you should update/compile/replace:
+- If you're using the splited core version. Update all the splited core include files which listed above. Recompile/install store.sp
+	--> Using the combined version of core just install store_combine.sp and rename store_combine.smx to store.smx
+- Update store-trade.sp since we're using the latest version of chat-processor. The message will be blank message if you're using the old version.
+- Optional: store_misc_voucher.sp
+- Must: store.phrases.txt
+
+
+################################################################################################
+Update 26/8/2022
+- Add bonus option for most of module gamble (Ratio/Bonus ratio will be specified by cvar.)
+- Update earning daily checkin.
+	-> The old daily give player 24hrs before check for daily again. This is annoying because of 24hrs waiting
+		and player have to wait up to 2 days by their timer to be able to checkin again.
+		This update will force the daily can be able to checkin after 12 A.M
+These updates were requested by issue [#98] (https://github.com/nuclearsilo583/zephyrus-store-preview-new-syntax/issues/98)
+################################################################################################
+Files changes:
+- store_gamble_blackjack.sp
+- store_gamble_coinflip.sp
+- store_gamble_dice.sp
+- store_misc_earnings.sp
+- store.phrases.txt
+
+Which files you should update/compile/replace:
+- If you want to use the bonus system for the gambling modules reinstall 3 store_gamble_ module.
+- If you don't want player to wait 24
+- Update translations files is always a MUST.
+
+If you're using earning module while using sqlite to store player daily data. Please edit your .sq3 and delete any store daily cookies.
+
+
+
+
+################################################################################################
+Update 24/8/2022
+- Update Core plugin to compatible with latest chat-processor
+- Update chat-processor to latest version (https://github.com/drixevel-dev/chat-processor)
+- Update Chat module to latest cp support
+- Update Color Variable include
+- Update store.inc and zephstocks.inc using <autoexecconfig>
+- Remove old Core plugin chat tag cvar
+- Update translations files using chat-processor format
+################################################################################################
+Files changes:
+- store.sp (v7.0.4 --> v7.0.5)
+- store_item_cpsupport.sp (v2.8 --> v2.9)
+- store_misc_giveaway.sp (using new store tag cvar)
+- store_misc_giveaway_aidnversion.sp (using new store tag cvar)
+
+- store.inc (remove old chat tag cvar)
+- zephstocks.inc (change CreateConVar to AutoExecConfig_CreateConVar)
+- colorvariables.inc (from decrypt to traditional syntax)
+- chat-processor.inc (to latest version from github)
+
+- store.phrases.txt (update translation using chat-processor format)
+
+Which files you should update/compile/replace:
+- store.inc (optional)
+- zephstocks.inc (optional. AutoExecConfig_CreateConVar will write and renew your cfg every time map has loaded. Recommend to replace this.)
+- colorvariables.inc (MUST)
+- chat-processor.inc (optional. But you should if you have any 3rd plugin using latest chat-processor include file).
+
+- store.sp (MUST. if you want to use the store with latest chat-processor. Copy/Replace both store.sp and zephstocks.inc. Then recompile store.sp)
+- store_misc_giveaway.sp (installing new store.sp above will cause missing chat tag. If you using this with old version of store.sp and upgrade store.sp. You must recompile/install this.)
+- store_misc_giveaway_aidnversion.sp (installing new store.sp above will cause missing chat tag. If you using this with old version of store.sp and upgrade store.sp. You must recompile/install this.)
+
+- store.phrases.txt (MUST if you install new version of store and chat-processor)
+
+
+
+
+################################################################################################
+Update 6/8/2022
+- Fix grenade model crash
+- Fix core database character set with special character (thanks to 1MaaaaaacK)
+- Fix OnConfigExecuted not execute on map change (cpsupport and voucher)
+- Fix voucher table for special character symbol
+################################################################################################
+Files changes:
+- store.sp (v7.0.3 --> v7.0.4)
+- store_item_grenskins.sp (v1.3 --> v1.4)
+- store_item_cpsupport.sp (v2.7 --> v2.8)
+- store_misc_voucher.sp (v2.0 --> v2.1)
+
+
+
+
+################################################################################################
+Update 5/8/2022 :
+- Fix sprays item can be used for free (issue [#92](https://github.com/nuclearsilo583/zephyrus-store-preview-new-syntax/issues/92))
+################################################################################################
+Files changes:
+- store_item_sprays.sp 
+	-> Change Sprays_OnClientConnected to OnClientConnected
