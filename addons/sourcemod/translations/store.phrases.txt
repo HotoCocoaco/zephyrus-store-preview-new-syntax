@@ -837,25 +837,25 @@
 	"Giveaway announcement"
 	{
 		"#format" 	"{1:s},{2:i}"
-		"en"		"<font color='#00CCFF'>Admin <font color='#ff0000'>{1}<font color='#00CCFF'> opened a giveaway with <font color='#15fb00'>{2} <font color='#00CCFF'>credits"
-		"pt"		"<font color='#00CCFF'>Admin <font color='#ff0000'>{1}<font color='#00CCFF'> começou um sorteio com <font color='#15fb00'>{2} <font color='#00CCFF'>créditos"
-		"chi"		"<font color='#00CCFF'>管理员 <font color='#ff0000'>{1}<font color='#00CCFF'> 开启了一次赠送活动，含有 <font color='#15fb00'>{2} <font color='#00CCFF'>点数"
+		"en"		"{1} opened a giveaway with {2} credits"
+		"pt"		"{1} começou um sorteio com {2} créditos"
+		"chi"		"管理员 {1} 开启了一次赠送活动，含有 {2} 点数"
 	}
 
 	"Giveaway remaining time"
 	{
 		"#format" 	"{1:i}"
-		"en"		"<font color='#15fb00'>|| Giveaway starts in <font color='#ffff00'>{1}<font color='#15fb00'> seconds ||"
-		"pt"		"<font color='#15fb00'>|| O Sorteio começa em <font color='#ffff00'>{1}<font color='#15fb00'> segundos ||"
-		"chi"		"<font color='#15fb00'>|| 赠送活动开始时间剩余 <font color='#ffff00'>{1}<font color='#15fb00'> 秒 ||"
+		"en"		"|| Giveaway starts in {1} seconds ||"
+		"pt"		"|| O Sorteio começa em {1} segundos ||"
+		"chi"		"|| 赠送活动开始时间剩余 {1} 秒 ||"
 	}
 
 	"Giveaway winner hint text"
 	{
 		"#format" 	"{1:s},{2:s}"
-		"en"		"<font color='#dd2f2f'>{1}\n<font color='#00CCFF'>|| <font color='#15fb00'>Winner: <font color='#ff0000'>{2}<font color='#00CCFF'> ||"
-		"pt"		"<font color='#dd2f2f'>{1}\n<font color='#00CCFF'>|| <font color='#15fb00'>Ganhador: <font color='#ff0000'>{2}<font color='#00CCFF'> ||"
-		"chi"		"<font color='#dd2f2f'>{1}\n<font color='#00CCFF'>|| <font color='#15fb00'>胜者: <font color='#ff0000'>{2}<font color='#00CCFF'> ||"
+		"en"		"{1}\n|| Winner: {2} ||"
+		"pt"		"{1}\n|| Ganhador: {2} ||"
+		"chi"		"{1}\n|| 胜者: {2} ||"
 	}
 
 	"Giveaway winner chat"
@@ -869,7 +869,7 @@
 	"Giveaway winner in progress"
 	{
 		"#format" 	"{1:s}"
-		"en"		"<font color='#00CCFF'>|| <font color='#15fb00'>{1} <font color='#00CCFF'>||"
+		"en"		"|| {1} ||"
 	}
 
 	"Low - #1-3 (1:2)"
