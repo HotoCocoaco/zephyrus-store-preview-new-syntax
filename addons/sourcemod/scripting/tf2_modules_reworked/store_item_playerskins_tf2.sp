@@ -13,13 +13,14 @@
 enum struct PlayerSkin
 {
 	char szModel[PLATFORM_MAX_PATH];
-	//char szArms[PLATFORM_MAX_PATH];
+	char szArms[PLATFORM_MAX_PATH];
 	int iSkin;
 	int iBody;
 	//bool:bTemporary,
 	int iTeam;
 	int nModelIndex;
 	int iClass;
+	int nArmModelIndex;
 }
 
 PlayerSkin g_ePlayerSkins[STORE_MAX_ITEMS];
@@ -80,12 +81,20 @@ public void PlayerSkins_OnMapStart()
 	{
 		g_ePlayerSkins[i].nModelIndex = PrecacheModel2(g_ePlayerSkins[i].szModel, true);
 		Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szModel);
+
+		if (g_ePlayerSkins[i].szArms[0])
+		{
+			g_ePlayerSkins[i].nArmModelIndex = PrecacheModel2(g_ePlayerSkins[i].szArms, true);
+			Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szArms);
+		}
+		
 	}
 }
 
 public int PlayerSkins_Reset()
 {
 	g_iPlayerSkins = 0;
+	return 0;
 }
 
 public bool PlayerSkins_Config(Handle &kv, int itemid)
@@ -97,6 +106,8 @@ public bool PlayerSkins_Config(Handle &kv, int itemid)
 	g_ePlayerSkins[g_iPlayerSkins].iSkin = KvGetNum(kv, "skin");
 	g_ePlayerSkins[g_iPlayerSkins].iTeam = KvGetNum(kv, "team");
 	g_ePlayerSkins[g_iPlayerSkins].iClass = KvGetNum(kv, "class");
+
+	KvGetString(kv, "arm", g_ePlayerSkins[g_iPlayerSkins].szArms, PLATFORM_MAX_PATH);
 
 
 	if(FileExists(g_ePlayerSkins[g_iPlayerSkins].szModel, true))
@@ -117,6 +128,11 @@ public int PlayerSkins_Equip(int client, int id)
 		if(IsPlayerAlive(client) && IsValidClient(client, true) && GetClientTeam(client)==g_ePlayerSkins[m_iData].iTeam && TF2_GetPlayerClassAsNumber(client)==g_ePlayerSkins[m_iData].iClass)
 		{
 			Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel);
+
+			if (g_ePlayerSkins[m_iData].szArms[0])
+			{
+				Store_SetClientArmModel(client, g_ePlayerSkins[m_iData].nArmModelIndex);
+			}
 		}
 
 		else if(Store_IsClientLoaded(client))
@@ -178,6 +194,11 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	{
 		int m_iData = Store_GetDataIndex(m_iEquipped);
 		Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel);
+
+		if (g_ePlayerSkins[m_iData].szArms[0])
+		{
+			Store_SetClientArmModel(client, g_ePlayerSkins[m_iData].nArmModelIndex);
+		}
 	}
 	return Plugin_Stop;
 }
@@ -189,6 +210,31 @@ void Store_SetClientModel(int client, const char[] model)
 	SetEntProp(client, Prop_Send, "m_bCustomModelRotates", 0);
 	SetEntProp(client, Prop_Send, "m_bUseClassAnimations", 1);
 	//SetEntProp(client, Prop_Send, "m_nBody", CalculateBodyGroups(client));
+}
+
+void Store_SetClientArmModel(int iClient, int iModelIndex)
+{
+	int iMaxWeapons = GetClientMaxWeapons(iClient);
+	for(int i = 0; i < iMaxWeapons; i++)
+	{
+		int iWeapon = GetPlayerWeaponSlot(iClient, i);
+		if (iWeapon != INVALID_ENT_REFERENCE)
+		{
+			{
+				char buffer[64];
+				GetEntityClassname(iWeapon, buffer, 64);
+				if (!StrContains(buffer, "tf_weapon_robot_arm") || !StrContains(buffer, "tf_weapon_pda_spy"))	{
+					return;
+				}
+			}
+			
+			if (HasEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex"))
+			{
+				SetEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex", iModelIndex);
+			}
+
+		}
+	}
 }
 
 public void Store_OnPreviewItem(int client, char[] type, int index)
@@ -341,4 +387,27 @@ stock int TF2_GetPlayerClassAsNumber(int client)
 		}
 	}
 	return Num;
+}
+
+stock int GetClientMaxWeapons(int client)
+{
+	int num;
+	TFClassType class = TF2_GetPlayerClass(client);
+	switch(class)
+	{
+		case TFClass_Scout, TFClass_Soldier, TFClass_DemoMan, TFClass_Heavy, TFClass_Medic, TFClass_Sniper:
+		{
+			num = 3;
+		}
+		case TFClass_Engineer:
+		{
+			num = 6;
+		}
+		case TFClass_Spy:
+		{
+			num = 5;
+		}
+	}
+
+	return num;
 }
