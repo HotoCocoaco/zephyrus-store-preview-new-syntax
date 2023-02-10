@@ -1,9 +1,7 @@
 #pragma semicolon 1
 #include <sourcemod>
-#include <sdktools>
 #include <sdkhooks>
 #include <morecolors>
-#include <tf2>
 #include <tf2_stocks>
 #include <sf2>
 
@@ -14,13 +12,14 @@
 enum struct PlayerSkin
 {
 	char szModel[PLATFORM_MAX_PATH];
-	//char szArms[PLATFORM_MAX_PATH];
+	char szArms[PLATFORM_MAX_PATH];
 	int iSkin;
 	int iBody;
 	//bool:bTemporary,
 	int iTeam;
 	int nModelIndex;
 	int iClass;
+	int nArmModelIndex;
 }
 
 PlayerSkin g_ePlayerSkins[STORE_MAX_ITEMS];
@@ -81,12 +80,20 @@ public void PlayerSkins_OnMapStart()
 	{
 		g_ePlayerSkins[i].nModelIndex = PrecacheModel2(g_ePlayerSkins[i].szModel, true);
 		Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szModel);
+
+		if (g_ePlayerSkins[i].szArms[0])
+		{
+			g_ePlayerSkins[i].nArmModelIndex = PrecacheModel2(g_ePlayerSkins[i].szArms, true);
+			Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szArms);
+		}
+		
 	}
 }
 
 public int PlayerSkins_Reset()
 {
 	g_iPlayerSkins = 0;
+	return 0;
 }
 
 public bool PlayerSkins_Config(Handle &kv, int itemid)
@@ -98,6 +105,8 @@ public bool PlayerSkins_Config(Handle &kv, int itemid)
 	g_ePlayerSkins[g_iPlayerSkins].iSkin = KvGetNum(kv, "skin");
 	g_ePlayerSkins[g_iPlayerSkins].iTeam = KvGetNum(kv, "team");
 	g_ePlayerSkins[g_iPlayerSkins].iClass = KvGetNum(kv, "class");
+
+	KvGetString(kv, "arm", g_ePlayerSkins[g_iPlayerSkins].szArms, PLATFORM_MAX_PATH);
 
 
 	if(FileExists(g_ePlayerSkins[g_iPlayerSkins].szModel, true))
@@ -115,9 +124,14 @@ public int PlayerSkins_Equip(int client, int id)
 	//int iIndex =  Store_GetDataIndex(id);
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
-		if(IsPlayerAlive(client) && IsValidClient(client, true) && GetClientTeam(client)==g_ePlayerSkins[m_iData].iTeam && TF2_GetPlayerClassAsNumber(client)==g_ePlayerSkins[m_iData].iClass)
+		if(IsPlayerAlive(client) && IsValidClient(client, true) && TF2_GetPlayerClassAsNumber(client)==g_ePlayerSkins[m_iData].iClass && !SF2_IsClientProxy(client))
 		{
 			Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel);
+
+			if (g_ePlayerSkins[m_iData].szArms[0])
+			{
+				Store_SetClientArmModel(client, g_ePlayerSkins[m_iData].nArmModelIndex);
+			}
 		}
 
 		else if(Store_IsClientLoaded(client))
@@ -149,7 +163,7 @@ public Action PlayerSkins_PlayerSpawn(Event event,const char[] name,bool dontBro
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
-		if(!IsClientInGame(client) || !IsPlayerAlive(client) || !(2<=GetClientTeam(client)<=3))
+		if(!IsClientInGame(client) || !IsPlayerAlive(client) || !SF2_IsClientProxy(client))
 			return Plugin_Continue;
 
 		float Delay = view_as<float>(g_eCvars[g_cvarSkinDelay].aCache);
@@ -171,11 +185,6 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	if (IsValidClient(client, true) && !IsPlayerAlive(client))
 		return Plugin_Stop;
 
-	if (SF2_IsClientProxy(client) == true) //检查是否为SF2的proxy
-	{
-		return Plugin_Stop;
-	}
-
 	int class = TF2_GetPlayerClassAsNumber(client)-1;
 	int m_iEquipped = Store_GetEquippedItem(client, "playerskin", class);
 	/*if(m_iEquipped < 0)
@@ -184,6 +193,11 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 	{
 		int m_iData = Store_GetDataIndex(m_iEquipped);
 		Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel);
+
+		if (g_ePlayerSkins[m_iData].szArms[0])
+		{
+			Store_SetClientArmModel(client, g_ePlayerSkins[m_iData].nArmModelIndex);
+		}
 	}
 	return Plugin_Stop;
 }
@@ -195,6 +209,26 @@ void Store_SetClientModel(int client, const char[] model)
 	SetEntProp(client, Prop_Send, "m_bCustomModelRotates", 0);
 	SetEntProp(client, Prop_Send, "m_bUseClassAnimations", 1);
 	//SetEntProp(client, Prop_Send, "m_nBody", CalculateBodyGroups(client));
+}
+
+void Store_SetClientArmModel(int iClient, int iModelIndex)
+{
+	int iMaxWeapons = GetEntPropArraySize(iClient, Prop_Send, "m_hMyWeapons");
+	for(int i = 0; i < iMaxWeapons; i++)
+	{
+		int iWeapon = GetEntPropEnt(iClient, Prop_Send, "m_hMyWeapons", i);
+		if (iWeapon != INVALID_ENT_REFERENCE)
+		{
+			char buffer[64];
+			GetEntityClassname(iWeapon, buffer, 64);
+			if (!StrContains(buffer, "tf_weapon_robot_arm") || !StrContains(buffer, "tf_weapon_pda_spy"))	{
+					continue;
+			}
+
+			SetEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex", iModelIndex);
+
+		}
+	}
 }
 
 public void Store_OnPreviewItem(int client, char[] type, int index)

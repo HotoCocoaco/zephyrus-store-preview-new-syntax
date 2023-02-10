@@ -214,24 +214,19 @@ void Store_SetClientModel(int client, const char[] model)
 
 void Store_SetClientArmModel(int iClient, int iModelIndex)
 {
-	int iMaxWeapons = GetClientMaxWeapons(iClient);
+	int iMaxWeapons = GetEntPropArraySize(iClient, Prop_Send, "m_hMyWeapons");
 	for(int i = 0; i < iMaxWeapons; i++)
 	{
-		int iWeapon = GetPlayerWeaponSlot(iClient, i);
+		int iWeapon = GetEntPropEnt(iClient, Prop_Send, "m_hMyWeapons", i);
 		if (iWeapon != INVALID_ENT_REFERENCE)
 		{
-			{
-				char buffer[64];
-				GetEntityClassname(iWeapon, buffer, 64);
-				if (!StrContains(buffer, "tf_weapon_robot_arm") || !StrContains(buffer, "tf_weapon_pda_spy"))	{
-					return;
-				}
+			char buffer[64];
+			GetEntityClassname(iWeapon, buffer, 64);
+			if (!StrContains(buffer, "tf_weapon_robot_arm") || !StrContains(buffer, "tf_weapon_pda_spy"))	{
+					continue;
 			}
-			
-			if (HasEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex"))
-			{
-				SetEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex", iModelIndex);
-			}
+
+			SetEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex", iModelIndex);
 
 		}
 	}
@@ -387,27 +382,4 @@ stock int TF2_GetPlayerClassAsNumber(int client)
 		}
 	}
 	return Num;
-}
-
-stock int GetClientMaxWeapons(int client)
-{
-	int num;
-	TFClassType class = TF2_GetPlayerClass(client);
-	switch(class)
-	{
-		case TFClass_Scout, TFClass_Soldier, TFClass_DemoMan, TFClass_Heavy, TFClass_Medic, TFClass_Sniper:
-		{
-			num = 3;
-		}
-		case TFClass_Engineer:
-		{
-			num = 6;
-		}
-		case TFClass_Spy:
-		{
-			num = 5;
-		}
-	}
-
-	return num;
 }
