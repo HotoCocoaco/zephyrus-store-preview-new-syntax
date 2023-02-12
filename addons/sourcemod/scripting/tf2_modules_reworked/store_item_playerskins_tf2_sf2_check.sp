@@ -221,7 +221,7 @@ void Store_SetClientArmModel(int iClient, int iModelIndex)
 		{
 			char buffer[64];
 			GetEntityClassname(iWeapon, buffer, 64);
-			if (!StrContains(buffer, "tf_weapon_robot_arm") || !StrContains(buffer, "tf_weapon_pda_spy"))	{
+			if (!StrContains(buffer, "tf_weapon_robot_arm") || !StrContains(buffer, "tf_weapon_pda_spy") || !StrContains(buffer, "tf_weapon_invis"))	{
 					continue;
 			}
 
