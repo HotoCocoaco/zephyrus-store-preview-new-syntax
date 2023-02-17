@@ -163,7 +163,7 @@ public Action PlayerSkins_PlayerSpawn(Event event,const char[] name,bool dontBro
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
-		if(!IsClientInGame(client) || !IsPlayerAlive(client) || !SF2_IsClientProxy(client))
+		if(!IsClientInGame(client) || !IsPlayerAlive(client) || SF2_IsClientProxy(client))
 			return Plugin_Continue;
 
 		float Delay = view_as<float>(g_eCvars[g_cvarSkinDelay].aCache);
