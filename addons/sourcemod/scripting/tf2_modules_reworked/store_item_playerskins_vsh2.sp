@@ -274,9 +274,8 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 void Store_SetClientModel(int client, const char[] model)
 {
 	SetVariantString(model);
-	AcceptEntityInput(client, "SetCustomModel");
+	AcceptEntityInput(client, "SetCustomModelWithClassAnimations");
 	SetEntProp(client, Prop_Send, "m_bCustomModelRotates", 0);
-	SetEntProp(client, Prop_Send, "m_bUseClassAnimations", 1);
 	SetEntProp(client, Prop_Send, "m_nBody", CalculateBodyGroups(client));
 	if (TF2_GetClientTeam(client) == TFTeam_Red)
 	{
