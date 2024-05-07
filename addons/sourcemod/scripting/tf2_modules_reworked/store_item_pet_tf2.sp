@@ -41,12 +41,14 @@ int g_iPreviewEntity[MAXPLAYERS + 1] = {INVALID_ENT_REFERENCE, ...};
 bool g_bHide[MAXPLAYERS + 1];
 Handle g_hHideCookie = INVALID_HANDLE;
 
+int g_bPetEnable = 1;
+
 public Plugin myinfo =
 {
 	name = "Store - Pet item module",
 	author = "nuclear silo, HotoCocoa", // If you should change the code, even for your private use, please PLEASE add your name to the author here
 	description = "",
-	version = "1.0.1", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
+	version = "1.0.2", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
 	url = ""
 };
 
@@ -65,6 +67,8 @@ public void OnPluginStart()
 
 	g_hHideCookie = RegClientCookie("Pets_Hide_Cookie", "Cookie to check if Pets are blocked", CookieAccess_Private);
 	SetCookieMenuItem(PrefMenu, 0, "");
+
+	g_bPetEnable = RegisterConVar("sm_store_pet_enable", "1", "Enable the pet module", TYPE_INT);
 }
 
 public void Store_OnConfigExecuted(char[] prefix)
@@ -148,6 +152,13 @@ public bool Pets_Config(KeyValues &kv, int itemid)
 
 public int Pets_Equip(int client, int itemid)
 {
+	if(!g_eCvars[g_bPetEnable].aCache)
+	{
+		CPrintToChat(client, "{yellow}[Store] {default}现在商店宠物模组暂时停用。");
+		return 0;
+	}
+		
+
 	g_iSelectedPet[client] = Store_GetDataIndex(itemid);
 	ResetPet(client);
 	if(IsPlayerAlive(client))
@@ -187,6 +198,12 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 	int client = GetClientOfUserId(event.GetInt("userid"));
 	if (!client || !IsPlayerAlive(client) || !(2<= GetClientTeam(client)<=3))
 		return;
+
+	if(!g_eCvars[g_bPetEnable].aCache)
+	{
+		CPrintToChatAll("{yellow}[Store] {default}现在商店宠物模组暂时停用。");
+		return;
+	}
 
 	ResetPet(client);
 	CreatePet(client);
