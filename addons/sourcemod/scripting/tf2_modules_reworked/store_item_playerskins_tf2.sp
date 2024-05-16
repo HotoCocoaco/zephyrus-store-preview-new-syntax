@@ -14,6 +14,7 @@ enum struct PlayerSkin
 {
 	char szModel[PLATFORM_MAX_PATH];
 	char szArms[PLATFORM_MAX_PATH];
+	char szGunslinger[PLATFORM_MAX_PATH];
 	int iSkin;
 	int iBody;
 	//bool:bTemporary,
@@ -21,6 +22,7 @@ enum struct PlayerSkin
 	int nModelIndex;
 	int iClass;
 	int nArmModelIndex;
+	int nGunslingerModelIndex;
 }
 
 PlayerSkin g_ePlayerSkins[STORE_MAX_ITEMS];
@@ -45,7 +47,7 @@ public Plugin myinfo =
 	name = "Store - Player Skin Module (No ZR version)",
 	author = "nuclear silo, HotoCocoa", // If you should change the code, even for your private use, please PLEASE add your name to the author here
 	description = "",
-	version = "1.0.1", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
+	version = "1.0.2", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
 	url = ""
 }
 
@@ -79,13 +81,18 @@ public void PlayerSkins_OnMapStart()
 {
 	for(int i=0;i<g_iPlayerSkins;++i)
 	{
-		g_ePlayerSkins[i].nModelIndex = PrecacheModel2(g_ePlayerSkins[i].szModel, true);
-		Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szModel);
+		g_ePlayerSkins[i].nModelIndex = PrecacheModel2(g_ePlayerSkins[i].szModel);
+		//Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szModel);
 
 		if (g_ePlayerSkins[i].szArms[0])
 		{
-			g_ePlayerSkins[i].nArmModelIndex = PrecacheModel2(g_ePlayerSkins[i].szArms, true);
-			Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szArms);
+			g_ePlayerSkins[i].nArmModelIndex = PrecacheModel2(g_ePlayerSkins[i].szArms);
+			//Downloader_AddFileToDownloadsTable(g_ePlayerSkins[i].szArms);
+		}
+
+		if (g_ePlayerSkins[i].szGunslinger[0])
+		{
+			g_ePlayerSkins[i].nGunslingerModelIndex = PrecacheModel2(g_ePlayerSkins[i].szGunslinger);
 		}
 		
 	}
@@ -108,6 +115,7 @@ public bool PlayerSkins_Config(Handle &kv, int itemid)
 	g_ePlayerSkins[g_iPlayerSkins].iClass = KvGetNum(kv, "class");
 
 	KvGetString(kv, "arm", g_ePlayerSkins[g_iPlayerSkins].szArms, PLATFORM_MAX_PATH);
+	KvGetString(kv, "gunslinger", g_ePlayerSkins[g_iPlayerSkins].szGunslinger, PLATFORM_MAX_PATH);
 
 
 	if(FileExists(g_ePlayerSkins[g_iPlayerSkins].szModel, true))
@@ -131,7 +139,7 @@ public int PlayerSkins_Equip(int client, int id)
 
 			if (g_ePlayerSkins[m_iData].szArms[0])
 			{
-				Store_SetClientArmModel(client, g_ePlayerSkins[m_iData].nArmModelIndex);
+				Store_SetClientArmModel(client, g_ePlayerSkins[m_iData]);
 			}
 		}
 
@@ -197,7 +205,7 @@ public Action PlayerSkins_PlayerSpawnPost(Handle timer, any userid)
 
 		if (g_ePlayerSkins[m_iData].szArms[0])
 		{
-			Store_SetClientArmModel(client, g_ePlayerSkins[m_iData].nArmModelIndex);
+			Store_SetClientArmModel(client, g_ePlayerSkins[m_iData]);
 		}
 	}
 	return Plugin_Stop;
@@ -212,7 +220,7 @@ void Store_SetClientModel(int client, const char[] model)
 	//SetEntProp(client, Prop_Send, "m_nBody", CalculateBodyGroups(client));
 }
 
-void Store_SetClientArmModel(int iClient, int iModelIndex)
+void Store_SetClientArmModel(int iClient, PlayerSkin skin)
 {
 	int iMaxWeapons = GetEntPropArraySize(iClient, Prop_Send, "m_hMyWeapons");
 	for(int i = 0; i < iMaxWeapons; i++)
@@ -222,11 +230,22 @@ void Store_SetClientArmModel(int iClient, int iModelIndex)
 		{
 			char buffer[64];
 			GetEntityClassname(iWeapon, buffer, 64);
-			if (!StrContains(buffer, "tf_weapon_robot_arm") || !StrContains(buffer, "tf_weapon_pda_spy") || !StrContains(buffer, "tf_weapon_invis"))	{
-					continue;
+			if (!StrContains(buffer, "tf_weapon_invis") || !StrContains(buffer, "tf_weapon_pda_spy"))
+			{
+				continue;
 			}
 
-			SetEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex", iModelIndex);
+			if (!StrContains(buffer, "tf_weapon_robot_arm"))
+			{
+				if (skin.nGunslingerModelIndex)
+				{
+					SetEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex", skin.nGunslingerModelIndex);
+				}
+				
+				continue;
+			}
+
+			SetEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex", skin.nArmModelIndex);
 
 		}
 	}
