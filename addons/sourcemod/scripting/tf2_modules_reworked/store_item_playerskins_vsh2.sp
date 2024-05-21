@@ -297,14 +297,14 @@ void Store_SetClientModel(int client, const char[] model)
 
 void Store_SetClientArmModel(int iClient, PlayerSkin skin)
 {
-	int iMaxWeapons = GetEntPropArraySize(iClient, Prop_Send, "m_hMyWeapons");
-	for(int i = 0; i < iMaxWeapons; i++)
+	int maxweapons = GetEntPropArraySize(iClient, Prop_Send, "m_hMyWeapons");
+	for(int i = 0; i < maxweapons; i++)
 	{
-		int iWeapon = GetEntPropEnt(iClient, Prop_Send, "m_hMyWeapons", i);
-		if (iWeapon != INVALID_ENT_REFERENCE)
+		int weapon = GetEntPropEnt(iClient, Prop_Send, "m_hMyWeapons", i);
+		if (weapon != INVALID_ENT_REFERENCE)
 		{
-			char buffer[64];
-			GetEntityClassname(iWeapon, buffer, 64);
+			char buffer[64], script[PLATFORM_MAX_PATH];
+			GetEntityClassname(weapon, buffer, 64);
 			if (!StrContains(buffer, "tf_weapon_invis") || !StrContains(buffer, "tf_weapon_pda_spy"))
 			{
 				continue;
@@ -314,13 +314,19 @@ void Store_SetClientArmModel(int iClient, PlayerSkin skin)
 			{
 				if (skin.nGunslingerModelIndex)
 				{
-					SetEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex", skin.nGunslingerModelIndex);
+					Format(script, PLATFORM_MAX_PATH, "self.SetCustomViewModel(`%s`)", skin.szGunslinger);
+					SetVariantString(script);
+					AcceptEntityInput(weapon, "RunScriptCode");
+					//SetEntProp(weapon, Prop_Send, "m_nCustomViewmodelModelIndex", skin.nGunslingerModelIndex);
 				}
 				
 				continue;
 			}
 
-			SetEntProp(iWeapon, Prop_Send, "m_nCustomViewmodelModelIndex", skin.nArmModelIndex);
+			Format(script, PLATFORM_MAX_PATH, "self.SetCustomViewModel(`%s`)", skin.szArms);
+			SetVariantString(script);
+			AcceptEntityInput(weapon, "RunScriptCode");
+			//SetEntProp(weapon, Prop_Send, "m_nCustomViewmodelModelIndex", skin.nArmModelIndex);
 		}
 			
 	}
