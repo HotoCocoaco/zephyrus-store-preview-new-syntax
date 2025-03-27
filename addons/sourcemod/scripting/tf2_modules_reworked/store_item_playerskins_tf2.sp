@@ -173,7 +173,7 @@ public Action PlayerSkins_PlayerSpawn(Event event,const char[] name,bool dontBro
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
-		if(!IsClientInGame(client) || !IsPlayerAlive(client) || !(2<=GetClientTeam(client)<=3))
+		if(!IsClientInGame(client) || !IsPlayerAlive(client) || !(2<=GetClientTeam(client)<=3) || !CanClientUseSkin(client))
 			return Plugin_Continue;
 
 		float Delay = view_as<float>(g_eCvars[g_cvarSkinDelay].aCache);
@@ -362,11 +362,13 @@ bool CanClientUseSkin(int client)
 		{
 			return true;
 		}
-		default:
+		case 2, 3:
 		{
-			return GetClientTeam(client) == g_iSkinTeam;
+			return (GetClientTeam(client) == g_iSkinTeam);
 		}
 	}
+
+	return false;
 }
 
 stock bool IsValidClient(int client, bool nobots = true)
