@@ -25,29 +25,24 @@ enum struct PlayerSkin
 	int nGunslingerModelIndex;
 }
 
-PlayerSkin g_ePlayerSkins[STORE_MAX_ITEMS];
 
 int g_iPlayerSkins = 0;
-
 int g_cvarSkinDelay = -1;
-
-
+int g_bSkinEnable;
+int g_iPreviewEntity[MAXPLAYERS + 1] = {INVALID_ENT_REFERENCE, ...};
+int g_iSkinTeam = 0;	// 0 - all ; 1 - Spectator??? ; 2 - Red ; 3 - Blue
+char m_szGameDir[32];
+char g_sChatPrefix[128];
+PlayerSkin g_ePlayerSkins[STORE_MAX_ITEMS];
 Handle g_hTimerPreview[MAXPLAYERS + 1];
 
-char m_szGameDir[32];
-
-int g_bSkinEnable;
-
-int g_iPreviewEntity[MAXPLAYERS + 1] = {INVALID_ENT_REFERENCE, ...};
-
-char g_sChatPrefix[128];
 
 public Plugin myinfo =
 {
 	name = "Store - Player Skin Module (No ZR version)",
 	author = "nuclear silo, HotoCocoa", // If you should change the code, even for your private use, please PLEASE add your name to the author here
 	description = "",
-	version = "1.0.2", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
+	version = "1.0.3", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
 	url = ""
 }
 
@@ -67,6 +62,7 @@ public void OnPluginStart()
 
 	g_cvarSkinDelay = RegisterConVar("sm_store_playerskin_delay", "2", "Delay after spawn before applying the skin. -1 means no delay", TYPE_FLOAT);
 	g_bSkinEnable = RegisterConVar("sm_store_playerskin_enable", "1", "Enable the player skin module", TYPE_INT);
+	g_iSkinTeam = RegisterConVar("sm_store_playerskin_team", "0", "Which team can use custom skin.", TYPE_INT);
 
 
 	HookEvent("player_spawn", PlayerSkins_PlayerSpawn);
@@ -111,7 +107,7 @@ public bool PlayerSkins_Config(Handle &kv, int itemid)
 	KvGetString(kv, "model", g_ePlayerSkins[g_iPlayerSkins].szModel, PLATFORM_MAX_PATH);
 
 	g_ePlayerSkins[g_iPlayerSkins].iSkin = KvGetNum(kv, "skin");
-	g_ePlayerSkins[g_iPlayerSkins].iTeam = KvGetNum(kv, "team");
+	//g_ePlayerSkins[g_iPlayerSkins].iTeam = KvGetNum(kv, "team");
 	g_ePlayerSkins[g_iPlayerSkins].iClass = KvGetNum(kv, "class");
 
 	KvGetString(kv, "arm", g_ePlayerSkins[g_iPlayerSkins].szArms, PLATFORM_MAX_PATH);
@@ -133,7 +129,12 @@ public int PlayerSkins_Equip(int client, int id)
 	//int iIndex =  Store_GetDataIndex(id);
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
-		if(IsPlayerAlive(client) && IsValidClient(client, true) && GetClientTeam(client)==g_ePlayerSkins[m_iData].iTeam && TF2_GetPlayerClassAsNumber(client)==g_ePlayerSkins[m_iData].iClass)
+		if(
+			IsPlayerAlive(client) && 
+			IsValidClient(client, true) && 
+			TF2_GetPlayerClassAsNumber(client)==g_ePlayerSkins[m_iData].iClass &&
+			CanClientUseSkin(client)
+			)
 		{
 			Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel);
 
@@ -351,6 +352,21 @@ public Action Timer_KillPreview(Handle timer, int client)
 	g_iPreviewEntity[client] = INVALID_ENT_REFERENCE;
 
 	return Plugin_Stop;
+}
+
+bool CanClientUseSkin(int client)
+{
+	switch(g_iSkinTeam)
+	{
+		case 0, 1:
+		{
+			return true;
+		}
+		default:
+		{
+			return GetClientTeam(client) == g_iSkinTeam;
+		}
+	}
 }
 
 stock bool IsValidClient(int client, bool nobots = true)

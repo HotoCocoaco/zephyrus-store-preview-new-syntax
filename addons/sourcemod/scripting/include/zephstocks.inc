@@ -371,14 +371,14 @@ public int MenuHandler_CloseClientMenu(Menu menu, MenuAction action, int client,
 
 }*/
 
-public bool TraceRayDontHitSelf(any entity,any mask, any data)
+public bool TraceRayDontHitSelf(int entity, int contentsMask, any data)
 {
 	if(entity == data)
 		return false;
 	return true;
 }
 
-public bool TraceRayDontHitPlayers(any entity,any mask, any data)
+public bool TraceRayDontHitPlayers(int entity, int contentsMask, any data)
 {
 	if(0 < entity <= MaxClients)
 		return false;
@@ -492,7 +492,7 @@ stock void ClearTimer(Handle &timer)
 	}
 }
 
-stock bool ShouldHappen(any chance)
+stock bool ShouldHappen(int chance)
 {
 	return (GetRandomInt(1, 100)<=chance?true:false);
 }
