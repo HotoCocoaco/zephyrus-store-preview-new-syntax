@@ -64,8 +64,9 @@ public void OnPluginStart()
 	g_bSkinEnable = RegisterConVar("sm_store_playerskin_enable", "1", "Enable the player skin module", TYPE_INT);
 	g_iSkinTeam = RegisterConVar("sm_store_playerskin_team", "0", "Which team can use custom skin.", TYPE_INT);
 
-
 	HookEvent("player_spawn", PlayerSkins_PlayerSpawn);
+
+	RegAdminCmd("sm_checkskin", Console_CheckSkin, ADMFLAG_CHEATS);
 }
 
 public void Store_OnConfigExecuted(char[] prefix)
@@ -173,7 +174,7 @@ public Action PlayerSkins_PlayerSpawn(Event event,const char[] name,bool dontBro
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (g_eCvars[g_bSkinEnable].aCache == 1)
 	{
-		if(!IsClientInGame(client) || !IsPlayerAlive(client) || !CanClientUseSkin(client))
+		if(!IsClientInGame(client) || !IsPlayerAlive(client) || !(2<=GetClientTeam(client)<=3) || !CanClientUseSkin(client))
 			return Plugin_Continue;
 
 		float Delay = view_as<float>(g_eCvars[g_cvarSkinDelay].aCache);
@@ -354,9 +355,16 @@ public Action Timer_KillPreview(Handle timer, int client)
 	return Plugin_Stop;
 }
 
+Action Console_CheckSkin(int client, int args)
+{
+	ReplyToCommand(client, "CanClientUseSkin %s\ng_iSkinTeam Cvar: %i", CanClientUseSkin(client) ? "true" : "false", g_eCvars[g_iSkinTeam].aCache);
+	
+	return Plugin_Continue;
+}
+
 bool CanClientUseSkin(int client)
 {
-	switch(g_iSkinTeam)
+	switch(g_eCvars[g_iSkinTeam].aCache)
 	{
 		case 0, 1:
 		{
