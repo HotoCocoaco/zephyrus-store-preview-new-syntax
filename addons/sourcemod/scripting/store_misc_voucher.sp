@@ -54,7 +54,7 @@ public Plugin myinfo =
 	name = "Store - Voucher module",
 	author = "shanapu, nuclear silo", // If you should change the code, even for your private use, please PLEASE add your name to the author here
 	description = "",
-	version = "2.2", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
+	version = "2.3", // If you should change the code, even for your private use, please PLEASE make a mark here at the version number
 	url = ""
 };
 
@@ -499,7 +499,7 @@ public Action Command_CreateItemVoucherCode(int client, int args)
 
 bool GenerateVoucherCode(char[] sBuffer, int maxlen)
 {
-	char sListOfChar[36][1] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
+	char sListOfChar[36][36] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
 
 	if (sBuffer[0])
 	{

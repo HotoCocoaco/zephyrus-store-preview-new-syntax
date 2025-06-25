@@ -5,6 +5,7 @@
 
 stock Downloader_ParseMDL(const String:model[], String:internal[], maxlen1, String:files[][], maxsize, maxlen2)
 {
+	#pragma unused maxsize
 	if(!FileExists2(model))
 		return 0;
 

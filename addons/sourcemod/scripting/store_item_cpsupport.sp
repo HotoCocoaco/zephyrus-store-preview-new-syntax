@@ -764,6 +764,8 @@ void Rainbow_String(const char[] input, char[] output, int maxLen)
 	strcopy(output, maxLen, sTemp);
 }
 
+// Old Rainbow format. Save for backup
+/*
 void String_Rainbow(const char[] input, char[] output, int maxLen)
 {
 	int bytes, buffs;
@@ -809,6 +811,7 @@ bool IsChar(char c)
 	
 	return false;
 }
+*/
 
 int RandomColor()
 {

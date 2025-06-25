@@ -506,6 +506,8 @@ public int Native_GetFlagFormatString(Handle plugin, int numParams)
 	g_MessageFormats.GetString(sFlag, sFormat, sizeof(sFormat));
 
 	SetNativeString(2, sFormat, GetNativeCell(3));
+
+	return 1;
 }
 
 ////////////////////

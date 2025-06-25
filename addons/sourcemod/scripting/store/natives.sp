@@ -258,7 +258,7 @@ public int Native_ShouldConfirm(Handle plugin,int numParams)
 
 public int Native_GetItem(Handle plugin,int numParams)
 {
-	SetNativeArray(2, view_as<int>(g_eItems[GetNativeCell(1)]), sizeof(g_eItems[])); 
+	SetNativeArray(2, g_eItems[GetNativeCell(1)], sizeof(g_eItems[])); 
 	
 	return 0;
 }
@@ -279,7 +279,7 @@ public int Native_GetItemIdbyUniqueId(Handle plugin, int numParams)
 
 public int Native_GetHandler(Handle plugin,int numParams)
 {
-	SetNativeArray(2, view_as<int>(g_eTypeHandlers[GetNativeCell(1)]), sizeof(g_eTypeHandlers[])); 
+	SetNativeArray(2, g_eTypeHandlers[GetNativeCell(1)], sizeof(g_eTypeHandlers[])); 
 	
 	return 0;
 }
@@ -293,7 +293,7 @@ public int Native_GetClientItem(Handle plugin,int numParams)
 	if(uid<0)
 		return 0;
 
-	SetNativeArray(3, view_as<int>(g_eClientItems[client][uid]), sizeof(g_eClientItems[][])); 
+	SetNativeArray(3, g_eClientItems[client][uid], sizeof(g_eClientItems[][])); 
 
 	return 1;
 }

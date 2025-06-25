@@ -6,13 +6,13 @@
 - NMRiH: now supported (check game modules folder)
 
 # Newly added
-Pinned: SM 1.11 is now the stable branch for sourcemod. Any error that cause with SM 1.10 will be no longer supported
+Pinned: SM 1.12 is now the stable branch for sourcemod. Any error that cause with SM 1.11 or 1.10 will be no longer supported
 
 - Added !rsloadout to reset current loadout for client (All items will be unequipped).
 - Better sync between store_equipment and store_items table for expired items.
 - Added !voucher <item_name/uid> and !createitemvoucher <item_name/uid> Root admin command for creating specified items.
 
-# zephyrus-store (compatible with SM 1.11).
+# zephyrus-store (compatible with SM 1.11 and 1.12).
 My rewritten zephyrus store
 
 Store system is mainly supported for CS:GO.
