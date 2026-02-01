@@ -29,6 +29,7 @@ enum struct PlayerSkin
 int g_iPlayerSkins = 0;
 int g_cvarSkinDelay = -1;
 int g_bSkinEnable;
+int g_bSkinInstant;
 int g_iPreviewEntity[MAXPLAYERS + 1] = {INVALID_ENT_REFERENCE, ...};
 int g_iSkinTeam = 0;	// 0 - all ; 1 - Spectator??? ; 2 - Red ; 3 - Blue
 char m_szGameDir[32];
@@ -63,10 +64,9 @@ public void OnPluginStart()
 	g_cvarSkinDelay = RegisterConVar("sm_store_playerskin_delay", "2", "Delay after spawn before applying the skin. -1 means no delay", TYPE_FLOAT);
 	g_bSkinEnable = RegisterConVar("sm_store_playerskin_enable", "1", "Enable the player skin module", TYPE_INT);
 	g_iSkinTeam = RegisterConVar("sm_store_playerskin_team", "0", "Which team can use custom skin.", TYPE_INT);
+	g_bSkinInstant = RegisterConVar("sm_store_playerskin_instant", "0", "Defines whether the skin should be changed instantly or on next spawn.", TYPE_INT);
 
 	HookEvent("player_spawn", PlayerSkins_PlayerSpawn);
-
-	RegAdminCmd("sm_checkskin", Console_CheckSkin, ADMFLAG_CHEATS);
 }
 
 public void Store_OnConfigExecuted(char[] prefix)
@@ -134,7 +134,8 @@ public int PlayerSkins_Equip(int client, int id)
 			IsPlayerAlive(client) && 
 			IsValidClient(client, true) && 
 			TF2_GetPlayerClassAsNumber(client)==g_ePlayerSkins[m_iData].iClass &&
-			CanClientUseSkin(client)
+			CanClientUseSkin(client) && 
+			g_eCvars[g_bSkinInstant].aCache == 1
 			)
 		{
 			Store_SetClientModel(client, g_ePlayerSkins[m_iData].szModel);
@@ -353,13 +354,6 @@ public Action Timer_KillPreview(Handle timer, int client)
 	g_iPreviewEntity[client] = INVALID_ENT_REFERENCE;
 
 	return Plugin_Stop;
-}
-
-Action Console_CheckSkin(int client, int args)
-{
-	ReplyToCommand(client, "CanClientUseSkin %s\ng_iSkinTeam Cvar: %i", CanClientUseSkin(client) ? "true" : "false", g_eCvars[g_iSkinTeam].aCache);
-	
-	return Plugin_Continue;
 }
 
 bool CanClientUseSkin(int client)
