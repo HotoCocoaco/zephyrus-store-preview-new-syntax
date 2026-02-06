@@ -3057,7 +3057,7 @@
 		"en" "You have sent {green}{1}{default} credits to {green}{2}{default}."
 		"pt" "Você enviou {green}{1}{default} créditos para {green}{2}{default}."
 		"hu" "{green}{1}{default} kreditet küldtél neki: {green}{2}{default}."
-		"chi" "你已经发送 {green}{1}{default} credits积分给 {green}{2}{default}."
+		"chi" "你已经发送 {green}{1}{default} 积分给 {green}{2}{default}."
 	}
 
 	"Credit Gift Received"
@@ -3253,7 +3253,7 @@
 		"en" "You earned {green}{1}{default} credits for killing {green}{2}{default}."
 		"pt" "Você ganhou {green}{1}{default} créditos por matar {green}{2}{default}."
 		"hu" "{green}{2}{default} megölésével {green}{1}{default} kreditet szereztél."
-		"chi" "你赚得 {green}{1}{default} Credits积分 击杀玩家 {green}{2}{default}."
+		"chi" "你赚得 {green}{1}{default} 积分 击杀玩家 {green}{2}{default}."
 	}
 
 	"Credits Earned For Playing"
