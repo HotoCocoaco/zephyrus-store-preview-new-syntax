@@ -201,7 +201,9 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 
 	if(!g_eCvars[g_bPetEnable].aCache)
 	{
-		CPrintToChatAll("{yellow}[Store] {default}现在商店宠物模组暂时停用。");
+		// 只提示给"已装备宠物"的本人，避免每次重生向全服广播刷屏
+		if (g_iSelectedPet[client] != -1)
+			CPrintToChat(client, "{yellow}[Store] {default}现在商店宠物模组暂时停用。");
 		return;
 	}
 
